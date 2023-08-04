@@ -5,7 +5,7 @@ from datastorage.bGPT_metadata import bGPT_metadata
 from datastorage.bGPT_posedata import bGPT_posedata
 from engine.bGPT_engine import bGPT_engine
 from engine.tranformation_lib.OpticalDistortTransform import OpticalDistortTransform
-
+from engine.tranformation_lib.ShiftTransform import ShiftTransform
 
 class bGPT_generator:
 
@@ -19,6 +19,8 @@ class bGPT_generator:
         ## special transformations for training that use full sequence information
         self.optical_distortion = OpticalDistortTransform(self.pose.frames)
         self.engine.add_transformation(self.optical_distortion)
+        self.shift = ShiftTransform(self.pose.frames)
+        self.engine.add_transformation(self.shift)
 
     def __repr__(self):
         transformations = ', '.join([str(transform) for transform in self.engine.transformations])
@@ -39,7 +41,7 @@ class bGPT_generator:
         plt.figure(figsize=(10, 10))
 
         # Create a colormap based on the number of transformations
-        colormap = plt.get_cmap(cmap, len(transformations) + 1)
+        colormap = plt.get_cmap(cmap, len(transformations) + 2)
 
         # Plot the original data first
         x_original = []
@@ -71,9 +73,28 @@ class bGPT_generator:
             plt.scatter(transformed_x, transformed_y, color=colormap(i + 1), label=str(transform.__repr__()), s=1,
                         alpha=0.5)
 
+        # After applying all given transformations, apply the ShiftTransform
+        shift_transform = ShiftTransform(current_frames)
+        shifted_x = []
+        shifted_y = []
+
+        # Apply the shift transformation to current_frames
+        for frame in current_frames:
+            for coord in frame.coords:
+                shifted_coord = shift_transform.transform(deepcopy(coord))
+                shifted_x.append(shifted_coord.x)
+                shifted_y.append(shifted_coord.y)
+                coord.x = shifted_coord.x  # Update the coordinate for the next transformation
+                coord.y = shifted_coord.y
+
+        # Plot the shifted coordinates using the next color in the colormap
+        plt.scatter(shifted_x, shifted_y, color=colormap(len(transformations) + 2),
+                    label=str(shift_transform.__repr__()), s=1, alpha=0.5)
+
         plt.title("Visualization of Transformations")
         plt.xlabel("X Coordinate")
         plt.ylabel("Y Coordinate")
         plt.legend(loc='upper right', markerscale=5)
+        plt.axis('equal')
         plt.grid(True)
         plt.show()

@@ -9,7 +9,6 @@ from engine.tranformation_lib.RotateTransform import RotateTransform
 from engine.tranformation_lib.ScaleTransform import ScaleTransform
 from engine.tranformation_lib.TranslateTransform import TranslateTransform
 
-os.chdir(r"D:\bGPT_generator-master")
 print(os.getcwd())
 
 generator = bGPT_generator(animal="mouse",
@@ -18,11 +17,11 @@ generator = bGPT_generator(animal="mouse",
                            use_likelihood=False)
 jitter = JitterTransform()
 scale = ScaleTransform(1.5)
-rotate = RotateTransform(math.radians(45))
+rotate = RotateTransform(math.radians(180))
 translate = TranslateTransform(100, 100)
 optical_distortion = OpticalDistortTransform(generator.pose.frames, 5e-10)
 perspective = PerspectiveTransform()
 
-print(generator)
+print(generator.pose.pack()[:100])
 
 generator.visualize_transformations([jitter, scale, rotate, translate, optical_distortion, perspective])
