@@ -31,11 +31,13 @@ class bGPT_generator:
         self.meta.end_index = end_frame
         print(f"bGPT_generator: current data range set to {start_frame} : {end_frame}")
 
-    def visualize_transformations(self, transformations, cmap='viridis'):
+    def visualize_transformations(self, transformations, cmap='nipy_spectral'):
+        transformations.append('')
+
         plt.figure(figsize=(10, 10))
 
         # Create a colormap based on the number of transformations
-        colormap = plt.get_cmap(cmap, len(transformations) + 2)
+        colormap = plt.get_cmap(cmap, len(transformations) + 1)
 
         # Plot the original data first
         x_original = []
@@ -47,21 +49,26 @@ class bGPT_generator:
         plt.scatter(x_original, y_original, color=colormap(0), label='Original', s=1,
                     alpha=0.5)  # Using the first color of colormap
 
-        current_frames = deepcopy(self.pose.frames)
+        current_frames = self.pose.frames
 
-        # Apply each transformation in sequence and plot
-        for i, transform in enumerate(transformations):
+        # Apply each transformation in transformations then plots
+        for i, transformation in enumerate(transformations):
+            print(i, transformation)
+
             transformed_x = []
             transformed_y = []
 
             # Apply the transformation to current_frames
             for frame in current_frames:
                 for coord in frame.coords:
-                    transformed_coord = transform.transform(deepcopy(coord))
+                    transformed_coord = transformation.transform(coord)
                     transformed_x.append(transformed_coord.x)
                     transformed_y.append(transformed_coord.y)
                     coord.x = transformed_coord.x  # Update the coordinate for the next transformation
                     coord.y = transformed_coord.y
+
+            if i == len(transformations) - 2:
+                transformations[-1] = _ShiftTransform(current_frames)
 
             # Plot the transformed coordinates using the next color in the colormap
             plt.scatter(transformed_x, transformed_y, color=colormap(i+1),

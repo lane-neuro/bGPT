@@ -1,13 +1,18 @@
+import random
+
 class PerspectiveTransform:
 
-    def __init__(self, perspective_coeff=0.0001):
-        self.perspective_coeff = perspective_coeff
+    def __init__(self,  min_in: float, max_in: float, random_in: float):
+        self.random_in = random_in
+        self.perspective_coeff = random.uniform(min_in, max_in)
+        self.random_roll = random.uniform(0, 1)
 
     def __repr__(self):
-        return f"PerspectiveTransform, perspective_coeff = {self.perspective_coeff}"
+        return f"PerspectiveTransform, perspective_coeff = {self.perspective_coeff}, r_in,r_roll = {self.random_in}, {self.random_roll}"
 
     def transform(self, datapoint):
-        scale = 1.0 + self.perspective_coeff * datapoint.y
-        datapoint.x *= scale
-        datapoint.y *= scale
+        if self.random_roll <= self.random_in:
+            scale = 1.0 + self.perspective_coeff * datapoint.y
+            datapoint.x *= scale
+            datapoint.y *= scale
         return datapoint
