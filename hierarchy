@@ -1,0 +1,46 @@
+# TRAINING LOOP
+
+## PASSED_OBJECTS
+DATA_DIRECTORIES = []
+M
+
+## MAGIC NUMBERS
+NUMBER_EPOCHS = 100 (default: TBD, or passed by user)
+MODEL_TYPE = 'GPT-2' 
+LEARNING_RATE = 6e-4 
+DEVICE = 'cuda'
+...
+
+## CREATED_OBJECTS
+dataset = get_dataset(list_of_file_paths) ## dictionary, 'paths' (csv) : 'number of indices' (frames)
+best_model = current_model
+
+## MODEL
+MODEL = models.get_model(MODEL_TYPE)
+
+### train_dataset
+what the model uses to learn
+
+### validate_dataset (likelihood of accuracy)
+what we use to validate how well the model is doing during learning
+
+### test_dataset
+what we use to validate how good the model is after learning
+
+for() -> per epoch
+    batches = get_batches(train_dataset) ### a lookup table
+    for() -> per batch per epoch
+        ## learning on the train_dataset
+
+
+    ## validate on the validation dataset
+    loss_validation = engine.get_loss(current_model, validate_dataset)
+
+    if current_model_loss < best_model_loss:
+        best_model = current_model
+
+
+## test best_model on test_dataset
+loss_test = engine.get_loss(best_model, test_dataset)
+    
+    

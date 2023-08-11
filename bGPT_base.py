@@ -1,8 +1,7 @@
-import sys
 import math
 import os
 
-from bGPT_generator import bGPT_generator
+from engine.bGPT_generator import bGPT_generator
 from engine.tranformation_lib.JitterTransform import JitterTransform
 from engine.tranformation_lib.OpticalDistortTransform import OpticalDistortTransform
 from engine.tranformation_lib.PerspectiveTransform import PerspectiveTransform
