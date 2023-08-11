@@ -1,3 +1,4 @@
+import sys
 import math
 import os
 
@@ -9,11 +10,14 @@ from engine.tranformation_lib.RotateTransform import RotateTransform
 from engine.tranformation_lib.ScaleTransform import ScaleTransform
 from engine.tranformation_lib.TranslateTransform import TranslateTransform
 
-print(os.getcwd())
+print("cwd: ", os.getcwd())
+datesets_dir = os.getcwd() + "/test/datasets/"
+test_file = ("8-30-2021-2-08 PM-Mohammad-ETHSensor-CB3-3_reencodedDLC_resnet50_odor-arenaOct3shuffle1_200000_filtered"
+             ".csv")
 
 generator = bGPT_generator(animal="mouse",
                            framerate=60,
-                           csv_path="8-30-2021-2-08 PM-Mohammad-ETHSensor-CB3-3_reencodedDLC_resnet50_odor-arenaOct3shuffle1_200000_filtered.csv",
+                           csv_path=datesets_dir + test_file,
                            use_likelihood=False)
 jitter = JitterTransform()
 scale = ScaleTransform(1.5)

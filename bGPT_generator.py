@@ -7,6 +7,7 @@ from engine.bGPT_engine import bGPT_engine
 from engine.tranformation_lib.OpticalDistortTransform import OpticalDistortTransform
 from engine.tranformation_lib.ShiftTransform import ShiftTransform
 
+
 class bGPT_generator:
 
     def __init__(self, animal: str, framerate: int, csv_path: str, use_likelihood=True):

@@ -11,3 +11,4 @@ engine/tranformation_lib/__pycache__/PerspectiveTransform.cpython-310.pyc
 engine/tranformation_lib/__pycache__/RotateTransform.cpython-310.pyc
 engine/tranformation_lib/__pycache__/ScaleTransform.cpython-310.pyc
 engine/tranformation_lib/__pycache__/TranslateTransform.cpython-310.pyc
+*.pyc
