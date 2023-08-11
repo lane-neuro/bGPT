@@ -3,9 +3,10 @@ from engine import bGPT_engine
 
 class bGPT_metadata:
 
-    def __init__(self, animal: str, framerate: int, engine: bGPT_engine):
+    def __init__(self, engine: bGPT_engine, animal: str, framerate: int, bodyparts: str):
         self.animal = animal
         self.body_parts_count = 0
+        self.bodyparts = bodyparts
         self.framerate = framerate
         self.engine = engine
         self.start_index = 0

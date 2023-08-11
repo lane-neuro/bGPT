@@ -51,7 +51,7 @@ class bGPT_posedata:
 
             for i, row in enumerate(csv_file, -3):
                 if self.meta.body_parts_count == 0:
-                    self.meta.body_parts_count = (len(row) - 1) / (3 if self.use_likelihood else 2)
+                    self.meta.body_parts_count = (len(row) - 1) / 3
                 if i >= 0:
                     self.frames.extend([bGPT_frame(self.use_likelihood, row[:])])
         print(

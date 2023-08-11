@@ -1,34 +1,26 @@
-from copy import deepcopy
 import matplotlib.pyplot as plt
 
-import engine.datastorage.bGPT_metadata
-from engine.datastorage import bGPT_metadata
+from engine import bGPT_engine
 from engine.datastorage.bGPT_posedata import bGPT_posedata
-from engine.bGPT_engine import bGPT_engine
+
 
 class bGPT_generator:
 
-    def __init__(self, animal: str, framerate: int, csv_path: str, use_likelihood=True):
-        self.use_likelihood = use_likelihood
-        self.engine = bGPT_engine()
-        self.meta = bGPT_metadata.bGPT_metadata(animal, framerate, self.engine)
-        self.pose = bGPT_posedata(self.meta, csv_path, self.use_likelihood)
+    def __init__(self, engine_in: bGPT_engine, csv_path: str):
+        self.engine = engine_in
+        self.pose = bGPT_posedata(self.engine.meta, csv_path, self.engine.use_likelihood)
         self.pose.extract_csv()
-
-    def __repr__(self):
-        transformations = ', '.join([str(transform) for transform in self.engine.transformations])
-        return f"bGPT_generator:(\nMetadata:\'{self.meta}\',\n\nTransformations: [{transformations}],\n\nPose Tokens:\'{self.pose.pack()}\', \n\nNumber of Pose Tokens: {len(self.pose.pack())})"
 
     def transform(self, *args):
         transformations = list(args)
-        self.engine = bGPT_engine(transformations)
+        # self.engine = bGPT_engine(transformations)
         self.pose.transform(self.engine)
         self.pose.frames = _ShiftTransform(self.pose.frames)
         return repr(self)
 
     def set_range(self, start_frame: int, end_frame: int):
-        self.meta.start_index = start_frame
-        self.meta.end_index = end_frame
+        self.engine.meta.start_index = start_frame
+        self.engine.meta.end_index = end_frame
         print(f"bGPT_generator: current data range set to {start_frame} : {end_frame}")
 
     def visualize_transformations(self, transformations, cmap='nipy_spectral'):
@@ -71,7 +63,7 @@ class bGPT_generator:
                 transformations[-1] = _ShiftTransform(current_frames)
 
             # Plot the transformed coordinates using the next color in the colormap
-            plt.scatter(transformed_x, transformed_y, color=colormap(i+1),
+            plt.scatter(transformed_x, transformed_y, color=colormap(i + 1),
                         label=str(transformation.__repr__()), s=1,
                         alpha=0.75)
 

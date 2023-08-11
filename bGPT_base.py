@@ -2,7 +2,7 @@ import math
 import os
 import random
 
-import engine.bGPT_generator
+from engine.bGPT_engine import bGPT_engine
 from engine.tranformation_lib.JitterTransform import JitterTransform
 from engine.tranformation_lib.PerspectiveTransform import PerspectiveTransform
 from engine.tranformation_lib.RotateTransform import RotateTransform
@@ -16,10 +16,12 @@ test_files = os.listdir(datesets_dir)
 # append datasets_dir to each file name
 test_files = [datesets_dir + file for file in test_files]
 
-generator = engine.bGPT_generator.bGPT_generator(animal="mouse",
-                                                 framerate=60,
-                                                 csv_path=test_files[0],
-                                                 use_likelihood=False)
+bgpt_engine = bGPT_engine(animal="mouse",
+                          framerate=60,
+                          bodyparts="nose, left ear, right ear, neck, body, tail base",
+                          coordinate_system="x,y",
+                          csv_path=test_files[0],
+                          use_likelihood=False)
 
 # we need to update the transformations, to take a min/max of possible values and return with random in that range.
 # random, that is how likely they are to be applied at all
@@ -37,8 +39,8 @@ random_transforms = [jitter,
 r_indices = random.sample(range(len(random_transforms)), k=len(random_transforms))
 random_transforms = [random_transforms[i] for i in r_indices]
 
-print(generator.pose.pack()[:100])
+print(bgpt_engine.pack_generator()[:100])
 
-generator.visualize_transformations(random_transforms)
+bgpt_engine.visualize_transformations(random_transforms)
 # print(random.shuffle(random_transforms))
 # print(random_transforms)
