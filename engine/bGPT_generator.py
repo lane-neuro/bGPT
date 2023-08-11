@@ -1,27 +1,19 @@
 from copy import deepcopy
 import matplotlib.pyplot as plt
 
-from datastorage.bGPT_metadata import bGPT_metadata
-from datastorage.bGPT_posedata import bGPT_posedata
+import engine.datastorage.bGPT_metadata
+from engine.datastorage import bGPT_metadata
+from engine.datastorage.bGPT_posedata import bGPT_posedata
 from engine.bGPT_engine import bGPT_engine
-from engine.tranformation_lib.OpticalDistortTransform import OpticalDistortTransform
-from engine.tranformation_lib.ShiftTransform import ShiftTransform
-
 
 class bGPT_generator:
 
     def __init__(self, animal: str, framerate: int, csv_path: str, use_likelihood=True):
         self.use_likelihood = use_likelihood
         self.engine = bGPT_engine()
-        self.meta = bGPT_metadata(animal, framerate, self.engine)
+        self.meta = bGPT_metadata.bGPT_metadata(animal, framerate, self.engine)
         self.pose = bGPT_posedata(self.meta, csv_path, self.use_likelihood)
         self.pose.extract_csv()
-
-        ## special transformations for training that use full sequence information
-        self.optical_distortion = OpticalDistortTransform(self.pose.frames)
-        self.engine.add_transformation(self.optical_distortion)
-        self.shift = ShiftTransform(self.pose.frames)
-        self.engine.add_transformation(self.shift)
 
     def __repr__(self):
         transformations = ', '.join([str(transform) for transform in self.engine.transformations])
@@ -31,6 +23,7 @@ class bGPT_generator:
         transformations = list(args)
         self.engine = bGPT_engine(transformations)
         self.pose.transform(self.engine)
+        self.pose.frames = _ShiftTransform(self.pose.frames)
         return repr(self)
 
     def set_range(self, start_frame: int, end_frame: int):
@@ -71,26 +64,9 @@ class bGPT_generator:
                     coord.y = transformed_coord.y
 
             # Plot the transformed coordinates using the next color in the colormap
-            plt.scatter(transformed_x, transformed_y, color=colormap(i + 1), label=str(transform.__repr__()), s=1,
-                        alpha=0.5)
-
-        # After applying all given transformations, apply the ShiftTransform
-        shift_transform = ShiftTransform(current_frames)
-        shifted_x = []
-        shifted_y = []
-
-        # Apply the shift transformation to current_frames
-        for frame in current_frames:
-            for coord in frame.coords:
-                shifted_coord = shift_transform.transform(deepcopy(coord))
-                shifted_x.append(shifted_coord.x)
-                shifted_y.append(shifted_coord.y)
-                coord.x = shifted_coord.x  # Update the coordinate for the next transformation
-                coord.y = shifted_coord.y
-
-        # Plot the shifted coordinates using the next color in the colormap
-        plt.scatter(shifted_x, shifted_y, color=colormap(len(transformations) + 2),
-                    label=str(shift_transform.__repr__()), s=1, alpha=0.5)
+            plt.scatter(transformed_x, transformed_y, color=colormap(i+1),
+                        label=str(transformation.__repr__()), s=1,
+                        alpha=0.75)
 
         plt.title("Visualization of Transformations")
         plt.xlabel("X Coordinate")
@@ -99,3 +75,20 @@ class bGPT_generator:
         plt.axis('equal')
         plt.grid(True)
         plt.show()
+
+
+class _ShiftTransform:
+    def __init__(self, pose_frames):
+        x_vals = [coord.x for frame in pose_frames for coord in frame.coords]
+        y_vals = [coord.y for frame in pose_frames for coord in frame.coords]
+
+        self.shift_x = abs(min(x_vals)) if min(x_vals) < 0 else 0
+        self.shift_y = abs(min(y_vals)) if min(y_vals) < 0 else 0
+
+    def __repr__(self):
+        return f"ShiftTransform, shift_x = {self.shift_x}, shift_y = {self.shift_y}"
+
+    def transform(self, datapoint):
+        datapoint.x += self.shift_x
+        datapoint.y += self.shift_y
+        return datapoint
