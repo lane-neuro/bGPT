@@ -44,3 +44,8 @@ print(bgpt_engine.pack_generator()[:100])
 bgpt_engine.visualize_transformations(random_transforms)
 # print(random.shuffle(random_transforms))
 # print(random_transforms)
+
+###
+
+DATASETS_DICTIONARY = {s: ['mouse', 60, False, "nose, left ear, right ear, neck, body, tail base"] for s in test_files}
+print(DATASETS_DICTIONARY)

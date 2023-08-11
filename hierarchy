@@ -1,7 +1,7 @@
 # TRAINING LOOP
 
 ## PASSED_OBJECTS
-DATA_DICTIONARY = {'paths':['metadata', .. , ]} ## dictionary, 'paths' : ['metadata', .. ,]
+DATASETS_DICTIONARY = {'paths':['metadata', .. , ]} ## dictionary, 'paths' : ['metadata', .. ,]
 
 ## MAGIC NUMBERS
 NUMBER_EPOCHS = 100 (default: TBD, or passed by user)
@@ -16,15 +16,28 @@ MODEL_PARAMETERS = {'param':float, .. ,} ## dictionary of parameters, has callab
 
 ## CREATED_OBJECTS
 current_model = engine.get_model(MODEL_TYPE, MODEL_PARAMETERS)
-dataset = engine.get_dataset(DATA_DICTIONARY) ## dictionary, 'paths' (csv) : 'number of indices' (frames)
+dataset = engine.get_dataset(DATASETS_DICTIONARY) ## dictionary, 'paths' (csv) : 'number of indices' (frames)
 best_model = current_model
 
 losses = []
 
 train_dataset, validate_dataset, test_dataset = engine.get_dataset_split(dataset, TRAIN_VAL_TEST_SPLIT, MODEL_PARAMETERS['block_size'])
 
+## train_dataset 
+lookups passed into generator
+
+many csv files, of N frames
+[xyxy] = the data for a single frame
+[meta] = the meta
+[pad] = pad
+
+datum = [pad][meta][xyxy][xyxy] .. [xyxy]
+len(datum) = block_size ## context when turned into tokens
+
+datums = [datum][datum] ... [datums] ## where there are number of datums == batch_size, all a NxM
+
 for() -> per epoch
-    batches = get_batches(train_dataset, MODEL_PARAMETERS['block_size']) ### a lookup table
+    batches = get_batches(train_dataset, MODEL_PARAMETERS['block_size']) ### start/stop indices linked to paths for generator
     for() -> per batch per epoch
         ## learning on the train_dataset
 
@@ -36,5 +49,4 @@ for() -> per epoch
 
 ## test best_model on test_dataset
 loss_test = engine.get_loss(best_model, test_dataset)
-    
-    
+
