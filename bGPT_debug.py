@@ -16,13 +16,6 @@ test_files = os.listdir(datesets_dir)
 # append datasets_dir to each file name
 test_files = [datesets_dir + file for file in test_files]
 
-bgpt_engine = bGPT_engine(animal="mouse",
-                          framerate=60,
-                          bodyparts="nose, left ear, right ear, neck, body, tail base",
-                          coordinate_system="x,y",
-                          csv_path=test_files[0],
-                          use_likelihood=False)
-
 # we need to update the transformations, to take a min/max of possible values and return with random in that range.
 # random, that is how likely they are to be applied at all
 jitter = JitterTransform(0.05, 0.2, .5)  # 0.05 - > 0.2 ; R = 0.25

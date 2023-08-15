@@ -4,15 +4,11 @@ from engine.bGPT_train import bGPT_train
 
 
 class bGPT_engine:
-    def __init__(self, animal: str, framerate: int, bodyparts: str, coordinate_system: str, csv_path: str,
-                 use_likelihood=True, transformations=None):
-        # move to bGPT_metadata
-        self.use_likelihood = use_likelihood
-        self.coordinate_system = coordinate_system
-        # end move
-
-        self.meta = engine.datastorage.bGPT_metadata.bGPT_metadata(self, animal, framerate, bodyparts)
-        self.generator = bGPT_generator(self, csv_path)
+    def __init__(self, animal: str, framerate: int, csv_path: str, bodyparts: list = None, coordinate_system: str = "xy",
+                 use_likelihood: bool = True, transformations: list = None):
+        self.meta = engine.datastorage.bGPT_metadata.bGPT_metadata(self, animal, csv_path, framerate, bodyparts,
+                                                                   coordinate_system, use_likelihood)
+        self.generator = bGPT_generator(self)
 
         if transformations is None:
             self.transformations = []
@@ -28,7 +24,9 @@ class bGPT_engine:
     def pack_generator(self):
         return self.generator.pose.pack()
 
-    def visualize_transformations(self, transformations, cmap='nipy_spectral'):
+    def visualize_transformations(self, cmap='nipy_spectral', transformations: list = None):
+        if transformations is None:
+            transformations = self.transformations
         return self.generator.visualize_transformations(transformations, cmap)
 
     def transform(self, datapoint):
@@ -40,4 +38,4 @@ class bGPT_engine:
         self.transformations.append(transformation)
 
     def load_dataset(self, training_files_in, validate_files_in, test_files_in):
-        self.training_init = bGPT_train(training_files_in, validate_files_in, test_files_in)
+        training_init = bGPT_train(training_files_in, validate_files_in, test_files_in)

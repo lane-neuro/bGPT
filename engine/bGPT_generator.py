@@ -7,9 +7,11 @@ from engine.datastorage.bGPT_posedata import bGPT_posedata
 
 class bGPT_generator:
 
-    def __init__(self, engine_in: bGPT_engine, csv_path: str):
+    def __init__(self, engine_in: bGPT_engine):
         self.engine = engine_in
-        self.pose = bGPT_posedata(self.engine.meta, csv_path, self.engine.use_likelihood)
+        self.meta = self.engine.meta
+
+        self.pose = bGPT_posedata(self.meta)
         self.pose.extract_csv()
 
     def transform(self, *args):
@@ -24,7 +26,7 @@ class bGPT_generator:
         self.engine.meta.end_index = end_frame
         print(f"bGPT_generator: current data range set to {start_frame} : {end_frame}")
 
-    def visualize_transformations(self, transformations, cmap='nipy_spectral'):
+    def visualize_transformations(self, transformations: list, cmap='nipy_spectral'):
         transformations.append('')
 
         plt.figure(figsize=(10, 10))

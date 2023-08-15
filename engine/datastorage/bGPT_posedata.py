@@ -7,10 +7,8 @@ from engine import bGPT_engine
 
 
 class bGPT_posedata:
-    def __init__(self, meta: bGPT_metadata, csv_path: str, use_likelihood):
-        self.use_likelihood = use_likelihood
+    def __init__(self, meta: bGPT_metadata):
         self.meta = meta
-        self.csv_path = csv_path
         self.frames = []
         print(f"bGPT_posedata: pose storage initialized")
 
@@ -46,8 +44,28 @@ class bGPT_posedata:
         return rounded_frame
 
     def extract_csv(self):
-        with open(self.csv_path, mode='r') as file:
+        with open(self.meta.csv_path, mode='r') as file:
             csv_file = csv.reader(file)
+
+            for i, row in enumerate(csv_file):
+                if i == 1:
+                    all_bodyparts = row[1:]
+                    csv_file.__next__()
+                    break
+
+            if self.meta.bodyparts is not None:
+                subset_indices = []
+                for i, bodypart in enumerate(all_bodyparts):
+                    if bodypart in self.meta.bodyparts:
+                        subset_indices.append(i)
+                subset_indices = [i+1 for i in subset_indices]
+            else:
+                subset_indices = [i+1 for i in range(0, len(all_bodyparts))]
+                self.meta.bodyparts = all_bodyparts[::3]
+            subset_indices.insert(0, 0)
+
+            print('Subset indices:', subset_indices)
+            print('self.meta.bodyparts', self.meta.bodyparts)
 
             for i, row in enumerate(csv_file, -3):
                 if self.meta.body_parts_count == 0:

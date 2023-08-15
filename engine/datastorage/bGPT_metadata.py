@@ -3,14 +3,26 @@ from engine import bGPT_engine
 
 class bGPT_metadata:
 
-    def __init__(self, engine: bGPT_engine, animal: str, framerate: int, bodyparts: list):
+    def __init__(self, engine: bGPT_engine, animal: str, csv_path: str, framerate: int,
+                 bodyparts: list = None, coordinate_system: str = "xy", use_likelihood: bool = True):
+
+        # stores the engine
+        self.engine = engine
+
+        # stores metadata of the animal
         self.animal = animal
         self.bodyparts = bodyparts
-        self.active_indices = list(range(0, len(bodyparts)))
+
+        # stores metadata of the video
+        self.csv_path = csv_path
         self.framerate = framerate
-        self.engine = engine
+        self.coordinate_system = coordinate_system
+        self.use_likelihood = use_likelihood
+
+        # stores current frame range
         self.start_index = 0
         self.end_index = 0
+
         print(f"bGPT_metadata: metadata storage initialized")
 
     def __repr__(self):
