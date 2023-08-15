@@ -1,0 +1,6 @@
+
+
+meta, body parts should have two options. 
+
+Default, use all body parts, extract body parts from the columns. 
+User input mask, only use user passed body parts

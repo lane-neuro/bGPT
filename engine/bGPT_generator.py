@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
 from engine import bGPT_engine
+from engine.datastorage import bGPT_metadata
 from engine.datastorage.bGPT_posedata import bGPT_posedata
 
 

@@ -5,6 +5,7 @@ from engine import bGPT_engine
 
 
 class bGPT_frame:
+
     def __init__(self, use_likelihood, *data_in):
         self.use_likelihood = use_likelihood
         row = []
