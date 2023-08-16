@@ -24,6 +24,11 @@ rotate = RotateTransform(0, 2 * math.pi, .5)  # 0 - 360 ; R = 0.25
 translate = TranslateTransform([0, 1000], [0, 1000], .5)  # 0 -> 1000, 0 -> 1000 ; R = 0.25
 perspective = PerspectiveTransform(0.00001, 0.00005, .5)  # 0.00001 -> 0.00005 ; R = 0.25
 
+random_bodyparts = False
+if random.uniform(0, 1) > .5:
+    random_bodyparts = True
+random_bodyparts_sample = random.uniform(0, 1)
+
 random_transforms = [jitter,
                      scale,
                      rotate,
@@ -32,9 +37,17 @@ random_transforms = [jitter,
 r_indices = random.sample(range(len(random_transforms)), k=len(random_transforms))
 random_transforms = [random_transforms[i] for i in r_indices]
 
-print(bgpt_engine.pack_generator()[:100])
+bgpt_engine = bGPT_engine(animal="mouse",
+                          framerate=60,
+                          bodyparts=['nose', 'lEar', 'neck', 'port'],
+                          coordinate_system="xy",
+                          csv_path=test_files[0],
+                          use_likelihood=False,
+                          transformations=random_transforms)
 
-bgpt_engine.visualize_transformations(random_transforms)
+print('Packing:', bgpt_engine.pack_generator()[:100])
+
+bgpt_engine.visualize_transformations()
 # print(random.shuffle(random_transforms))
 # print(random_transforms)
 

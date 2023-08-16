@@ -78,7 +78,6 @@ class bGPT_generator:
         plt.grid(True)
         plt.show()
 
-
 class _ShiftTransform:
     def __init__(self, pose_frames):
         x_vals = [coord.x for frame in pose_frames for coord in frame.coords]

@@ -24,7 +24,7 @@ class bGPT_posedata:
             rounded_frame = self.round_frame(iframe)
             frame_str = "~"
             for coord in rounded_frame.coords:
-                if self.use_likelihood:
+                if self.meta.use_likelihood:
                     frame_str += f"{coord.x}_{coord.y}_{coord.likelihood},"
                 else:
                     frame_str += f"{coord.x}_{coord.y},"
@@ -37,7 +37,7 @@ class bGPT_posedata:
         for coord in rounded_frame.coords:
             coord.x = round(coord.x, 3)
             coord.y = round(coord.y, 3)
-            if self.use_likelihood:
+            if self.meta.use_likelihood:
                 coord.likelihood = round(coord.likelihood, 3)
             else:
                 coord.likelihood = None  # You can set it to None or just not store it at all.
@@ -58,9 +58,9 @@ class bGPT_posedata:
                 for i, bodypart in enumerate(all_bodyparts):
                     if bodypart in self.meta.bodyparts:
                         subset_indices.append(i)
-                subset_indices = [i+1 for i in subset_indices]
+                subset_indices = [i + 1 for i in subset_indices]
             else:
-                subset_indices = [i+1 for i in range(0, len(all_bodyparts))]
+                subset_indices = [i + 1 for i in range(0, len(all_bodyparts))]
                 self.meta.bodyparts = all_bodyparts[::3]
             subset_indices.insert(0, 0)
 
@@ -68,12 +68,10 @@ class bGPT_posedata:
             print('self.meta.bodyparts', self.meta.bodyparts)
 
             for i, row in enumerate(csv_file, -3):
-                if self.meta.body_parts_count == 0:
-                    self.meta.body_parts_count = (len(row) - 1) / 3
-                if i >= 0:
-                    self.frames.extend([bGPT_frame(self.use_likelihood, row[:])])
-        print(
-            f"bGPT_posedata: \'{self.meta.animal}\' .csv file extracted for {self.meta.body_parts_count} coordinates across {len(self.frames)} frames.")
+                self.frames.extend([bGPT_frame(self.meta.use_likelihood,
+                                               [row[j] for j in subset_indices])])
+        print(f"bGPT_posedata: \'{self.meta.animal}\' .csv file extracted for {len(self.meta.bodyparts)} "
+              f"coordinates across {len(self.frames)} frames.")
 
     def transform(self, engine: bGPT_engine):
         for iframe in self.frames:
