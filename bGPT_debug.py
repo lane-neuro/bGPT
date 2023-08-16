@@ -19,9 +19,6 @@ test_files = os.listdir(datesets_dir)
 test_files = [datesets_dir + file for file in test_files]
 print()
 
-print("test_files:")
-print(test_files)
-
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
                                                         "mouse", 60, False)
 for key in datasets_dictionary:
