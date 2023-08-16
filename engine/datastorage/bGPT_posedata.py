@@ -7,10 +7,12 @@ from engine import bGPT_engine
 
 
 class bGPT_posedata:
-    def __init__(self, meta: bGPT_metadata):
+    def __init__(self, meta: bGPT_metadata, verbose):
         self.meta = meta
+        self.verbose = verbose
         self.frames = []
-        print(f"bGPT_posedata: pose storage initialized")
+        if self.verbose:
+            print(f"bGPT_posedata: pose storage initialized")
 
     def __repr__(self):
         return f"bGPT_posedata:(\'{self.pack()}\')"
@@ -58,20 +60,21 @@ class bGPT_posedata:
                 for i, bodypart in enumerate(all_bodyparts):
                     if bodypart in self.meta.bodyparts:
                         subset_indices.append(i)
-                subset_indices = [i + 1 for i in subset_indices]
+                subset_indices = [i+1 for i in subset_indices]
             else:
-                subset_indices = [i + 1 for i in range(0, len(all_bodyparts))]
+                subset_indices = [i+1 for i in range(0, len(all_bodyparts))]
                 self.meta.bodyparts = all_bodyparts[::3]
             subset_indices.insert(0, 0)
 
-            print('Subset indices:', subset_indices)
-            print('self.meta.bodyparts', self.meta.bodyparts)
+            if self.verbose:
+                print('Subset indices:', subset_indices)
+                print('self.meta.bodyparts', self.meta.bodyparts)
 
             for i, row in enumerate(csv_file, -3):
-                self.frames.extend([bGPT_frame(self.meta.use_likelihood,
-                                               [row[j] for j in subset_indices])])
-        print(f"bGPT_posedata: \'{self.meta.animal}\' .csv file extracted for {len(self.meta.bodyparts)} "
-              f"coordinates across {len(self.frames)} frames.")
+                self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
+
+        if self.verbose:
+            print(f"bGPT_posedata: \'{self.meta.animal}\' .csv file extracted for {self.meta.bodyparts} coordinates across {len(self.frames)} frames.")
 
     def transform(self, engine: bGPT_engine):
         for iframe in self.frames:

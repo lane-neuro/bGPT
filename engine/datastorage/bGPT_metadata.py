@@ -4,10 +4,12 @@ from engine import bGPT_engine
 class bGPT_metadata:
 
     def __init__(self, engine: bGPT_engine, animal: str, csv_path: str, framerate: int,
-                 bodyparts: list = None, coordinate_system: str = "xy", use_likelihood: bool = True):
+                 bodyparts: list = None, coordinate_system: str = "xy", use_likelihood: bool = True,
+                 verbose: bool = False):
 
         # stores the engine
         self.engine = engine
+        self.verbose = verbose
 
         # stores metadata of the animal
         self.animal = animal
@@ -23,24 +25,34 @@ class bGPT_metadata:
         self.start_index = 0
         self.end_index = 0
 
-        print(f"bGPT_metadata: metadata storage initialized")
+        if self.verbose:
+            print(f"bGPT_metadata: metadata storage initialized")
 
     def __repr__(self):
         return f"bGPT_metadata:(Animal: \'{self.animal}\', Framerate: {self.framerate}fps, Start index: \'{self.start_index}\')"
 
+    def pack(self):
+        packed = f"{self.animal}~{self.framerate}~{self.coordinate_system}"
+        bodyparts_str = ','.join(self.bodyparts)
+        packed = f"{packed}~{bodyparts_str}~"
+        return packed
     def modify_bodypart_name(self, index, name):
         prior_name = self.bodyparts[index]
         self.bodyparts[index] = name
-        print(f"bGPT_metadata: Bodypart [{index}](\'{prior_name}\') renamed to \'{name}\'")
+        if self.verbose:
+            print(f"bGPT_metadata: Bodypart [{index}](\'{prior_name}\') renamed to \'{name}\'")
 
     def set_start_index(self, index):
         self.start_index = index
-        print(f"bGPT_metadata: Start index set to {index}")
+        if self.verbose:
+            print(f"bGPT_metadata: Start index set to {index}")
 
     def set_end_index(self, index):
         self.end_index = index
-        print(f"bGPT_metadata: End index set to {index}")
+        if self.verbose:
+            print(f"bGPT_metadata: End index set to {index}")
 
     def set_framerate(self, framerate):
         self.framerate = framerate
-        print(f"bGPT_metadata: Framerate set to {framerate}")
+        if self.verbose:
+            print(f"bGPT_metadata: Framerate set to {framerate}")
