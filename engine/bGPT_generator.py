@@ -7,11 +7,13 @@ from engine.datastorage.bGPT_posedata import bGPT_posedata
 
 class bGPT_generator:
 
-    def __init__(self, engine_in: bGPT_engine):
+    def __init__(self, engine_in: bGPT_engine, verbose):
+        self.verbose = verbose
+
         self.engine = engine_in
         self.meta = self.engine.meta
 
-        self.pose = bGPT_posedata(self.meta)
+        self.pose = bGPT_posedata(self.meta, verbose)
         self.pose.extract_csv()
 
     def transform(self, *args):
@@ -24,7 +26,8 @@ class bGPT_generator:
     def set_range(self, start_frame: int, end_frame: int):
         self.engine.meta.start_index = start_frame
         self.engine.meta.end_index = end_frame
-        print(f"bGPT_generator: current data range set to {start_frame} : {end_frame}")
+        if self.verbose:
+            print(f"bGPT_generator: current data range set to {start_frame} : {end_frame}")
 
     def visualize_transformations(self, transformations: list, cmap='nipy_spectral'):
         transformations.append('')
@@ -48,7 +51,8 @@ class bGPT_generator:
 
         # Apply each transformation in transformations then plots
         for i, transformation in enumerate(transformations):
-            print(i, transformation)
+            if self.verbose:
+                print(i, transformation)
 
             transformed_x = []
             transformed_y = []
@@ -77,6 +81,7 @@ class bGPT_generator:
         plt.axis('equal')
         plt.grid(True)
         plt.show()
+
 
 class _ShiftTransform:
     def __init__(self, pose_frames):

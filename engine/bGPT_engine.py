@@ -4,17 +4,21 @@ from engine.bGPT_train import bGPT_train
 
 
 class bGPT_engine:
-    def __init__(self, animal: str, framerate: int, csv_path: str, bodyparts: list = None, coordinate_system: str = "xy",
-                 use_likelihood: bool = True, transformations: list = None):
+    def __init__(self, animal: str, framerate: int, csv_path: str,
+                 bodyparts: list = None, coordinate_system: str = "xy",
+                 use_likelihood: bool = True, transformations: list = None,
+                 verbose: bool = False):
+        self.verbose = verbose
         self.meta = engine.datastorage.bGPT_metadata.bGPT_metadata(self, animal, csv_path, framerate, bodyparts,
-                                                                   coordinate_system, use_likelihood)
-        self.generator = bGPT_generator(self)
+                                                                   coordinate_system, use_likelihood, verbose)
+        self.generator = bGPT_generator(self, verbose)
 
         if transformations is None:
             self.transformations = []
         else:
             self.transformations = transformations
-        print("bGPT_engine: transformation engine initialized")
+        if verbose:
+            print("bGPT_engine: transformation engine initialized")
 
     def __repr__(self):
         transformations = ', '.join([str(transform) for transform in self.transformations])
@@ -23,6 +27,9 @@ class bGPT_engine:
 
     def pack_generator(self):
         return self.generator.pose.pack()
+
+    def pack_meta(self):
+        return self.meta.pack()
 
     def visualize_transformations(self, cmap='nipy_spectral', transformations: list = None):
         if transformations is None:

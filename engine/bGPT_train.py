@@ -12,3 +12,5 @@ class bGPT_train:
     def __repr__(self):
         return f"bGPT_train:(\n'train files:{self.train}\n',\n'validate files{self.validate}\n',\n'test files{self.test}\n')"
 
+
+
