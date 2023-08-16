@@ -9,49 +9,48 @@ from engine.tranformation_lib.RotateTransform import RotateTransform
 from engine.tranformation_lib.ScaleTransform import ScaleTransform
 from engine.tranformation_lib.TranslateTransform import TranslateTransform
 
+from bGPT_aid import bGPT_aid
+
 print("cwd: ", os.getcwd())
 datesets_dir = os.getcwd() + "\\test\\example_datasets\\"
 # array of dataset files in directory
 test_files = os.listdir(datesets_dir)
 # append datasets_dir to each file name
 test_files = [datesets_dir + file for file in test_files]
+print()
 
-# we need to update the transformations, to take a min/max of possible values and return with random in that range.
-# random, that is how likely they are to be applied at all
-jitter = JitterTransform(0.05, 0.2, .5)  # 0.05 - > 0.2 ; R = 0.25
-scale = ScaleTransform(0.5, 1.5, .5)  # 0.5 -> 1.5 ; R = 0.25
-rotate = RotateTransform(0, 2 * math.pi, .5)  # 0 - 360 ; R = 0.25
-translate = TranslateTransform([0, 1000], [0, 1000], .5)  # 0 -> 1000, 0 -> 1000 ; R = 0.25
-perspective = PerspectiveTransform(0.00001, 0.00005, .5)  # 0.00001 -> 0.00005 ; R = 0.25
+datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
+                                                        "mouse", 60, False)
+for key in datasets_dictionary:
+    print(key, ":", datasets_dictionary[key])
 
-random_bodyparts = False
-if random.uniform(0, 1) > .5:
-    random_bodyparts = True
-random_bodyparts_sample = random.uniform(0, 1)
+    random_transforms = [JitterTransform(0.05, 0.2, .5),
+                         ScaleTransform(0.5, 1.5, .5),
+                         RotateTransform(0, 2 * math.pi, .5),
+                         TranslateTransform([0, 1000], [0, 1000], .5),
+                         PerspectiveTransform(0.00001, 0.00005, .5)]
+    r_indices = random.sample(range(len(random_transforms)), k=len(random_transforms))
 
-random_transforms = [jitter,
-                     scale,
-                     rotate,
-                     translate,
-                     perspective]
-r_indices = random.sample(range(len(random_transforms)), k=len(random_transforms))
-random_transforms = [random_transforms[i] for i in r_indices]
+    bgpt_engine = bGPT_engine(csv_path = key,
+                              animal = datasets_dictionary[key][0],
+                              framerate = datasets_dictionary[key][1],
+                              use_likelihood = datasets_dictionary[key][2],
+                              bodyparts = datasets_dictionary[key][3],
+                              coordinate_system = datasets_dictionary[key][4],
+                              transformations = random_transforms,
+                              verbose = False)
 
-bgpt_engine = bGPT_engine(animal="mouse",
-                          framerate=60,
-                          bodyparts=['nose', 'lEar', 'neck', 'port'],
-                          coordinate_system="xy",
-                          csv_path=test_files[0],
-                          use_likelihood=False,
-                          transformations=random_transforms)
+    print('bGPT_engine:')
 
-print('Packing:', bgpt_engine.pack_generator()[:100])
+    print('metadata:', bgpt_engine.pack_meta())
 
-bgpt_engine.visualize_transformations()
-# print(random.shuffle(random_transforms))
-# print(random_transforms)
+    print('pose data:')
+    print(bgpt_engine.pack_generator()[:100])
+    print('...')
+    print(bgpt_engine.pack_generator()[-100:])
 
-###
+    print('visualizing transformations...')
+    bgpt_engine.visualize_transformations()
 
-DATASETS_DICTIONARY = {s: ['mouse', 60, False, "nose, left ear, right ear, neck, body, tail base"] for s in test_files}
-print(DATASETS_DICTIONARY)
+    print()
+
