@@ -1,6 +1,47 @@
 
-
 meta, body parts should have two options. 
 
 Default, use all body parts, extract body parts from the columns. 
 User input mask, only use user passed body parts
+
+tokenization: 
+    
+    x1, y1, ..., xn, yn = D
+        len(tokens) = Ld
+    meta str -> tokenizer -> [int1, int2, ...] = M
+        len(tokens) = Lm
+    block_size = Lm + Ld
+    
+    Ir (input_row) = M + D
+    Im (input_matrix) = [Ir1 Ir2 ... Irn] = 1 batch
+    1 batch -> neural network
+        [batch1 batch2 ... batchn] = 1 epoch
+
+batcher
+
+    Responsible for grabbing the tokenized text and making a matrix for the model.
+
+core engine:
+
+    each csv = 1 engine
+    responsible for core task of opening & manipulating csv files
+    each layer contains an engine
+
+core scheduler:
+
+    each core engine is associated with core scheduler
+
+    needs a special mode outside the training, to initialize itself so it can know indices inregards to tokens 
+
+    responsible for holding indices for the batching
+
+scheduler:
+
+    one queue for all core schedulers
+
+    responsible for assigning the batch scanners locations
+
+    responsible for calculating and knowing how many iterations there are in an epoch
+
+    responsible for knowing when an epoch ends
+

@@ -36,6 +36,7 @@ class bGPT_metadata:
         bodyparts_str = ','.join(self.bodyparts)
         packed = f"{packed}~{bodyparts_str}~"
         return packed
+
     def modify_bodypart_name(self, index, name):
         prior_name = self.bodyparts[index]
         self.bodyparts[index] = name

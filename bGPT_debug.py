@@ -20,7 +20,7 @@ test_files = [datesets_dir + file for file in test_files]
 print()
 
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
-                                                        "mouse", 60, False)
+                                                        "mouse", 60, True)
 for key in datasets_dictionary:
     print(key, ":", datasets_dictionary[key])
 
