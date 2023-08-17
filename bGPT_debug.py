@@ -27,6 +27,7 @@ enc = tiktoken.get_encoding(model_type)
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
                                                         "mouse", 60, True)
 for key in datasets_dictionary:
+    print('###############################################')
     print(key, ":", datasets_dictionary[key])
 
     random_transforms = [JitterTransform(0.05, 0.2, .5),
@@ -49,20 +50,25 @@ for key in datasets_dictionary:
 
     metadata = bgpt_engine.pack_meta()
     print('metadata:', metadata)
+    print('metadata length:', len(metadata))
 
     enc_metadata = enc.encode_ordinary(metadata)
-    print('encoding metadata:', enc_metadata)
+    print('encoded metadata:', enc_metadata)
+    print('encoded metadata length:', len(enc_metadata))
 
     print('ratio length metadata / length encoding data:', len(metadata) / len(enc_metadata))
 
     print('pose data:')
     pose = bgpt_engine.pack_generator()
+    print('pose data length:', len(pose))
+
     print(pose[:100])
     print('...')
     print(pose[-100:])
 
     print('encoding pose data:')
     enc_pose = enc.encode_ordinary(pose)
+    print('encoded pose data length:', len(enc_pose))
     print(enc_pose[:100])
     print('...')
     print(enc_pose[-100:])
@@ -72,5 +78,6 @@ for key in datasets_dictionary:
     print('visualizing transformations...')
     bgpt_engine.visualize_transformations()
 
+    print('###############################################')
     print()
 
