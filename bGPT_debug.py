@@ -25,7 +25,7 @@ model_type = 'gpt2'
 enc = tiktoken.get_encoding(model_type)
 
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
-                                                        "mouse", 60, True)
+                                                          "mouse", 60, True)
 for key in datasets_dictionary:
     print('###############################################')
     print(key, ":", datasets_dictionary[key])
@@ -37,14 +37,14 @@ for key in datasets_dictionary:
                          PerspectiveTransform(0.00001, 0.00005, .5)]
     r_indices = random.sample(range(len(random_transforms)), k=len(random_transforms))
 
-    bgpt_engine = bGPT_engine(csv_path = key,
-                              animal = datasets_dictionary[key][0],
-                              framerate = datasets_dictionary[key][1],
-                              use_likelihood = datasets_dictionary[key][2],
-                              bodyparts = datasets_dictionary[key][3],
-                              coordinate_system = datasets_dictionary[key][4],
-                              transformations = random_transforms,
-                              verbose = False)
+    bgpt_engine = bGPT_engine(csv_path=key,
+                              animal=datasets_dictionary[key][0],
+                              framerate=datasets_dictionary[key][1],
+                              use_likelihood=datasets_dictionary[key][2],
+                              bodyparts=datasets_dictionary[key][3],
+                              coordinate_system=datasets_dictionary[key][4],
+                              transformations=random_transforms,
+                              verbose=False)
 
     print('bGPT_engine:')
 
@@ -80,4 +80,3 @@ for key in datasets_dictionary:
 
     print('###############################################')
     print()
-

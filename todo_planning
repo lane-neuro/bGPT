@@ -45,3 +45,9 @@ scheduler:
 
     responsible for knowing when an epoch ends
 
+scanner:
+    
+    each scanner (# of scanners = batch size) has an associated width -> index_start, index_end, width (fixed)
+
+    outputs 1-D token list, which is fed into a 2-D tensor array, which is put into the model
+
