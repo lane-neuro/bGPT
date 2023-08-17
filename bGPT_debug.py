@@ -2,6 +2,8 @@ import math
 import os
 import random
 
+import tiktoken
+
 from engine.bGPT_engine import bGPT_engine
 from engine.tranformation_lib.JitterTransform import JitterTransform
 from engine.tranformation_lib.PerspectiveTransform import PerspectiveTransform
@@ -18,6 +20,9 @@ test_files = os.listdir(datesets_dir)
 # append datasets_dir to each file name
 test_files = [datesets_dir + file for file in test_files]
 print()
+
+model_type = 'gpt2'
+enc = tiktoken.get_encoding(model_type)
 
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
                                                         "mouse", 60, True)
@@ -42,12 +47,27 @@ for key in datasets_dictionary:
 
     print('bGPT_engine:')
 
-    print('metadata:', bgpt_engine.pack_meta())
+    metadata = bgpt_engine.pack_meta()
+    print('metadata:', metadata)
+
+    enc_metadata = enc.encode_ordinary(metadata)
+    print('encoding metadata:', enc_metadata)
+
+    print('ratio length metadata / length encoding data:', len(metadata) / len(enc_metadata))
 
     print('pose data:')
-    print(bgpt_engine.pack_generator()[:100])
+    pose = bgpt_engine.pack_generator()
+    print(pose[:100])
     print('...')
-    print(bgpt_engine.pack_generator()[-100:])
+    print(pose[-100:])
+
+    print('encoding pose data:')
+    enc_pose = enc.encode_ordinary(pose)
+    print(enc_pose[:100])
+    print('...')
+    print(enc_pose[-100:])
+
+    print('ratio length pose data / length encoding data:', len(pose) / len(enc_pose))
 
     print('visualizing transformations...')
     bgpt_engine.visualize_transformations()
