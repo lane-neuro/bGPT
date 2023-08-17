@@ -24,6 +24,8 @@ print()
 model_type = 'gpt2'
 enc = tiktoken.get_encoding(model_type)
 
+#~398.035_155.661_0.004,398.88_156.85_0.002,452.748_217.207_0.039,398.641_156.159_0.002,467.551_207.1
+
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
                                                           "mouse", 60, True)
 for key in datasets_dictionary:
