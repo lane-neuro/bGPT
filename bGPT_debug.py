@@ -30,8 +30,31 @@ enc = tiktoken.get_encoding(model_type)
 
 datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files[:1],
                                                           "mouse", 60, True)
+
+## initialize scanners, test functions ##
 for key in datasets_dictionary:
+    print('################### scanner functions ####################')
+    print(key, ":", datasets_dictionary[key])
+
+    bgpt_engine = bGPT_engine(csv_path=key,
+                              animal=datasets_dictionary[key][0],
+                              framerate=datasets_dictionary[key][1],
+                              use_likelihood=datasets_dictionary[key][2],
+                              bodyparts=datasets_dictionary[key][3],
+                              verbose=False)
+
+    metadata = bgpt_engine.pack_meta()
+    enc_metadata = enc.encode_ordinary(metadata)
+
+    pose = bgpt_engine.pack_generator()
+    enc_pose = enc.encode_ordinary(pose)
+
     print('###############################################')
+    print()
+
+## test training functions ##
+for key in datasets_dictionary:
+    print('################### training functions ####################')
     print(key, ":", datasets_dictionary[key])
 
     random_transforms = [JitterTransform(0.05, 0.2, .5),

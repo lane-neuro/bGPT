@@ -1,5 +1,6 @@
 import csv
 from copy import deepcopy
+from itertools import islice
 
 from engine.datastorage import bGPT_metadata
 from engine.datastorage.bGPT_frame import bGPT_frame
@@ -72,9 +73,8 @@ class bGPT_posedata:
                 print('self.meta.bodyparts', self.meta.bodyparts)
 
             if self.frame_resample_by > 1:
-                for i, row in enumerate(csv_file, -3):
-                    if (i + 3) % self.frame_resample_by == 0:
-                        self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
+                for row in islice(csv_file, 0, None, self.frame_resample_by):
+                    self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
             else:
                 for i, row in enumerate(csv_file, -3):
                     self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
