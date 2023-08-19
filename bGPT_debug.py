@@ -11,6 +11,8 @@ from engine.tranformation_lib.RotateTransform import RotateTransform
 from engine.tranformation_lib.ScaleTransform import ScaleTransform
 from engine.tranformation_lib.TranslateTransform import TranslateTransform
 
+from engine.tranformation_lib.RandomResampleFps import RandomResampleFps
+
 from bGPT_aid import bGPT_aid
 
 print("cwd: ", os.getcwd())
@@ -26,7 +28,7 @@ enc = tiktoken.get_encoding(model_type)
 
 #~398.035_155.661_0.004,398.88_156.85_0.002,452.748_217.207_0.039,398.641_156.159_0.002,467.551_207.1
 
-datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files,
+datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files[:1],
                                                           "mouse", 60, True)
 for key in datasets_dictionary:
     print('###############################################')
@@ -39,14 +41,19 @@ for key in datasets_dictionary:
                          PerspectiveTransform(0.00001, 0.00005, .5)]
     r_indices = random.sample(range(len(random_transforms)), k=len(random_transforms))
 
+    fps = datasets_dictionary[key][1]
+    r_fps = RandomResampleFps(fps, 0.5).transform()
+    print(f'fps: {fps}, r_fps: {r_fps}')
+
     bgpt_engine = bGPT_engine(csv_path=key,
                               animal=datasets_dictionary[key][0],
-                              framerate=datasets_dictionary[key][1],
+                              framerate=fps,
                               use_likelihood=datasets_dictionary[key][2],
                               bodyparts=datasets_dictionary[key][3],
                               coordinate_system=datasets_dictionary[key][4],
-                              transformations=random_transforms,
-                              verbose=False)
+                              image_transformations=random_transforms,
+                              resample_fps=r_fps,
+                              verbose=True)
 
     print('bGPT_engine:')
 

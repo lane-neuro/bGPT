@@ -6,17 +6,27 @@ from engine.bGPT_train import bGPT_train
 class bGPT_engine:
     def __init__(self, animal: str, framerate: int, csv_path: str,
                  bodyparts: list = None, coordinate_system: str = "xy",
-                 use_likelihood: bool = True, transformations: list = None,
-                 verbose: bool = False):
+                 use_likelihood: bool = True, image_transformations: list = None,
+                 resample_fps: int = None, verbose: bool = False):
         self.verbose = verbose
-        self.meta = engine.datastorage.bGPT_metadata.bGPT_metadata(self, animal, csv_path, framerate, bodyparts,
-                                                                   coordinate_system, use_likelihood, verbose)
+        self.resample_fps = resample_fps
+
+        framerate = framerate
+        frame_resample_by = 1
+        if self.resample_fps is not None:
+            frame_resample_by = framerate // self.resample_fps
+            if verbose:
+                print(f"bGPT_engine: Resampling video to {self.resample_fps}fps, frames resample by {frame_resample_by}th index")
+            framerate = self.resample_fps
+
+        self.meta = engine.datastorage.bGPT_metadata.bGPT_metadata(self, animal, csv_path, framerate, frame_resample_by,
+                                                                   bodyparts, coordinate_system, use_likelihood, verbose)
         self.generator = bGPT_generator(self, verbose)
 
-        if transformations is None:
+        if image_transformations is None:
             self.transformations = []
         else:
-            self.transformations = transformations
+            self.transformations = image_transformations
         if verbose:
             print("bGPT_engine: transformation engine initialized")
 

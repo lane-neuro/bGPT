@@ -11,6 +11,7 @@ class bGPT_posedata:
         self.meta = meta
         self.verbose = verbose
         self.frames = []
+        self.frame_resample_by = self.meta.frame_resample_by
         if self.verbose:
             print(f"bGPT_posedata: pose storage initialized")
 
@@ -70,8 +71,13 @@ class bGPT_posedata:
                 print('Subset indices:', subset_indices)
                 print('self.meta.bodyparts', self.meta.bodyparts)
 
-            for i, row in enumerate(csv_file, -3):
-                self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
+            if self.frame_resample_by > 1:
+                for i, row in enumerate(csv_file, -3):
+                    if (i + 3) % self.frame_resample_by == 0:
+                        self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
+            else:
+                for i, row in enumerate(csv_file, -3):
+                    self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
 
         if self.verbose:
             print(f"bGPT_posedata: \'{self.meta.animal}\' .csv file extracted for {self.meta.bodyparts} coordinates across {len(self.frames)} frames.")

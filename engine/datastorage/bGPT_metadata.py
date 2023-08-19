@@ -3,7 +3,7 @@ from engine import bGPT_engine
 
 class bGPT_metadata:
 
-    def __init__(self, engine: bGPT_engine, animal: str, csv_path: str, framerate: int,
+    def __init__(self, engine: bGPT_engine, animal: str, csv_path: str, framerate: int, frame_resample_by: int,
                  bodyparts: list = None, coordinate_system: str = "xy", use_likelihood: bool = True,
                  verbose: bool = False):
 
@@ -18,6 +18,7 @@ class bGPT_metadata:
         # stores metadata of the video
         self.csv_path = csv_path
         self.framerate = framerate
+        self.frame_resample_by = frame_resample_by
         self.coordinate_system = coordinate_system
         self.use_likelihood = use_likelihood
 
