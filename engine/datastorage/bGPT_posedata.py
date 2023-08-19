@@ -13,8 +13,14 @@ class bGPT_posedata:
         self.verbose = verbose
         self.frames = []
         self.frame_resample_by = self.meta.frame_resample_by
+        self.start_index = self.meta.start_index
+        self.end_index = self.meta.end_index
+        if self.end_index is not None:
+            self.end_index = int(self.end_index * self.frame_resample_by)
         if self.verbose:
             print(f"bGPT_posedata: pose storage initialized")
+            print(f"bGPT_posedata: frame resample by {self.frame_resample_by}")
+            print(f"bGPT_posedata: start index {self.start_index}, end index {self.end_index}")
 
     def __repr__(self):
         return f"bGPT_posedata:(\'{self.pack()}\')"
@@ -72,12 +78,8 @@ class bGPT_posedata:
                 print('Subset indices:', subset_indices)
                 print('self.meta.bodyparts', self.meta.bodyparts)
 
-            if self.frame_resample_by > 1:
-                for row in islice(csv_file, 0, None, self.frame_resample_by):
-                    self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
-            else:
-                for i, row in enumerate(csv_file, -3):
-                    self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
+            for row in islice(csv_file, self.start_index, self.end_index, self.frame_resample_by):
+                self.frames.extend([bGPT_frame(self.meta.use_likelihood, row[:])])
 
         if self.verbose:
             print(f"bGPT_posedata: \'{self.meta.animal}\' .csv file extracted for {self.meta.bodyparts} coordinates across {len(self.frames)} frames.")

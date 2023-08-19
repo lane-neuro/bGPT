@@ -5,7 +5,7 @@ class bGPT_metadata:
 
     def __init__(self, engine: bGPT_engine, animal: str, csv_path: str, framerate: int, frame_resample_by: int,
                  bodyparts: list = None, coordinate_system: str = "xy", use_likelihood: bool = True,
-                 verbose: bool = False):
+                 verbose: bool = False, start_index: int = None, end_index: int = None):
 
         # stores the engine
         self.engine = engine
@@ -23,8 +23,8 @@ class bGPT_metadata:
         self.use_likelihood = use_likelihood
 
         # stores current frame range
-        self.start_index = 0
-        self.end_index = 0
+        self.start_index = start_index
+        self.end_index = end_index
 
         if self.verbose:
             print(f"bGPT_metadata: metadata storage initialized")

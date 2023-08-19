@@ -7,7 +7,8 @@ class bGPT_engine:
     def __init__(self, animal: str, framerate: int, csv_path: str,
                  bodyparts: list = None, coordinate_system: str = "xy",
                  use_likelihood: bool = True, image_transformations: list = None,
-                 resample_fps: int = None, verbose: bool = False):
+                 resample_fps: int = None, verbose: bool = False,
+                 start_index: int = None, end_index: int = None):
         self.verbose = verbose
         self.resample_fps = resample_fps
 
@@ -20,7 +21,8 @@ class bGPT_engine:
             framerate = self.resample_fps
 
         self.meta = engine.datastorage.bGPT_metadata.bGPT_metadata(self, animal, csv_path, framerate, frame_resample_by,
-                                                                   bodyparts, coordinate_system, use_likelihood, verbose)
+                                                                   bodyparts, coordinate_system, use_likelihood, verbose,
+                                                                   start_index, end_index)
         self.generator = bGPT_generator(self, verbose)
 
         if image_transformations is None:
