@@ -32,12 +32,16 @@ class bGPT_posedata:
 
         for iframe in self.frames:
             rounded_frame = self.round_frame(iframe)
-            frame_str = "~"
+            frame_str = "<"
             for coord in rounded_frame.coords:
+                x_str = "{:08.3f}".format(coord.x)
+                y_str = "{:08.3f}".format(coord.y)
                 if self.meta.use_likelihood:
-                    frame_str += f"{coord.x}_{coord.y}_{coord.likelihood},"
+                    likelihood_str = "{:07.3f}".format(coord.likelihood)
+                    frame_str += f"{x_str} {y_str} {likelihood_str}_"
                 else:
-                    frame_str += f"{coord.x}_{coord.y},"
+                    frame_str += f"{x_str} {y_str}_"
+            frame_str += ">"
             pose_out += frame_str.rstrip(',')  # Remove trailing comma if present
         return pose_out
 

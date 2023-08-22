@@ -37,7 +37,7 @@ class bGPT_engine:
         return (f"bGPT_generator:(\nMetadata:\'{self.meta}\',\n\nTransformations: [{transformations}],\n\nPose Tokens:"
                 f"\'{self.pack_generator()}\', \n\nNumber of Pose Tokens: {len(self.pack_generator())})")
 
-    def pack_generator(self):
+    def pack_generator(self, apply_transformations: bool = True):
         return self.generator.pose.pack()
 
     def pack_meta(self):

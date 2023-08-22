@@ -2,6 +2,8 @@ import math
 import os
 import random
 import numpy as np
+import re
+from itertools import islice
 
 import tiktoken
 
@@ -30,12 +32,28 @@ enc = tiktoken.get_encoding(model_type)
 block_size = 1024
 batch_size = 8
 
-datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files[:1],
-                                                          "mouse", 60, True)
+datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files[:2],
+                                                          "mouse", 60, False)
 scanners_dictionary = {key:{'scanners':{i:{'start':None, 'end':None} for i in range(0,batch_size)},
                             'length_meta':None,
                             'length_pose':None,
                             'window_width':None} for key in datasets_dictionary}
+
+def count_characters_and_check_expected(pose_out, expected_length=None):
+    # Find all substrings enclosed between < and >
+    frames = re.findall(r'<(.*?)>', pose_out)
+
+    # If expected_length is not provided, use the length of the first frame
+    if expected_length is None and frames:
+        expected_length = len(frames[0])
+
+    discrepancies = []
+    for frame in frames:
+        if len(frame) != expected_length:
+            discrepancies.append((len(frame), frame))
+
+    return len(frames), discrepancies
+
 
 ## initialize scanners, test functions ##
 for key in datasets_dictionary:
@@ -52,20 +70,56 @@ for key in datasets_dictionary:
                               verbose=False)
 
     metadata = bgpt_engine.pack_meta()
+    len_metadata = len(metadata)
+    print('metadata:', metadata)
+    enc_metadata = enc.encode_ordinary(metadata)
+    len_enc_metadata = len(enc_metadata)
+    print('len_enc_metadata:', len_enc_metadata)
+
+    bodyparts = metadata.split('~')[-2]
+    bodyparts = [s for s in bodyparts.split(',')]
+    len_bodyparts = len(bodyparts)
+    print('bodyparts:', bodyparts)
+    print('len_bodyparts:', len_bodyparts)
 
     pose = bgpt_engine.pack_generator()
     enc_pose = enc.encode_ordinary(pose)
+    len_pose = len(pose)
+    len_enc_pose = len(enc_pose)
 
-    tokenization_compression_ratio = len(enc_pose)/len(pose)
+    tokenization_compression_ratio = len_enc_pose/len_pose
 
-    window_width = round(block_size * tokenization_compression_ratio + 0.1)
+    with open(key, 'r') as file:
+        nrows_csv = sum(1 for _ in islice(file, 3, None))
+    print('nrows_csv:', nrows_csv)
+
+    total_frames, discrepancies = count_characters_and_check_expected(pose)
+    print('total_frames:', total_frames)
+    print('discrepancies:', discrepancies)
+    for length, frame in discrepancies:
+        print(f"Length: {length}, Frame: <{frame}>")
+
+    characters_per_row = math.ceil(len_pose / nrows_csv)
+    print('pose:', pose[:characters_per_row])
+    enc_characters_per_row = len_enc_pose / nrows_csv
+    print('enc_pose:', enc_pose[:math.ceil(enc_characters_per_row)])
+
+    characters_per_bodypart = int((characters_per_row-2)/len_bodyparts) ## should always be 18
+    if characters_per_bodypart != 18:
+        print('ERROR: characters_per_bodypart != 18')
+
+    window_width = math.ceil(block_size/(characters_per_row * tokenization_compression_ratio))
+    print('window_width =', window_width, '; characters per row =', characters_per_row, '; characters per bodypart =', characters_per_bodypart)
+    print('enc_characters_per_row =', enc_characters_per_row, '; tokenization_compression_ratio =', tokenization_compression_ratio)
+    nframes_enc_block = (block_size - len_enc_metadata)/enc_characters_per_row
+    print('nframes_enc_block =', nframes_enc_block)
 
     scanners_dictionary[key]['window_width'] = window_width
 
-    scanner_dict['length_meta'] = len(metadata)
-    scanner_dict['length_pose'] = len(pose)
+    scanner_dict['length_meta'] = len_metadata
+    scanner_dict['length_pose'] = len_pose
 
-    scanner_start_positions = np.arange(0, len(pose), len(pose)/8)
+    scanner_start_positions = np.arange(0, len_pose, len_pose/8)
     scanner_start_positions = [round(i) for i in scanner_start_positions]
 
     for ikey in scanner_dict['scanners']:
@@ -76,6 +130,7 @@ for key in datasets_dictionary:
 
     print('###############################################')
     print()
+
 
 ## test training functions ##
 for key in datasets_dictionary:
@@ -109,7 +164,7 @@ for key in datasets_dictionary:
                                   resample_fps=r_fps,
                                   start_index=start,
                                   end_index=end,
-                                  verbose=True)
+                                  verbose=False)
 
         print('bGPT_engine:')
 
@@ -118,8 +173,9 @@ for key in datasets_dictionary:
         print('metadata length:', len(metadata))
 
         enc_metadata = enc.encode_ordinary(metadata)
+        length_enc_metadata = len(enc_metadata)
         print('encoded metadata:', enc_metadata)
-        print('encoded metadata length:', len(enc_metadata))
+        print('encoded metadata length:', length_enc_metadata)
 
         print('ratio length metadata / length encoding data:', len(metadata) / len(enc_metadata))
 
@@ -133,12 +189,24 @@ for key in datasets_dictionary:
 
         print('encoding pose data:')
         enc_pose = enc.encode_ordinary(pose)
-        print('encoded pose data length:', len(enc_pose))
+        length_enc_pose = len(enc_pose)
+        print('encoded pose data length:', length_enc_pose)
         print(enc_pose[:100])
         print('...')
         print(enc_pose[-100:])
 
-        print('ratio length pose data / length encoding data:', len(pose) / len(enc_pose))
+        print('ratio length pose data / length encoding data:', length_enc_metadata / length_enc_pose)
+
+        print('length enc_meta + enc_pose:', length_enc_metadata + length_enc_pose)
+
+        enc_pose_finish_index = block_size - length_enc_metadata
+        enc_pose_out = enc_pose[:enc_pose_finish_index]
+        enc_pose_pred = enc_pose[enc_pose_finish_index+1:enc_pose_finish_index+2]
+        enc_data = enc_metadata + enc_pose_out
+
+        print('enc_data length:', len(enc_data))
+        print('enc_data:', enc_data)
+        print('enc_pose_pred:', enc_pose_pred)
 
         print('visualizing transformations...')
         bgpt_engine.visualize_transformations()
@@ -147,3 +215,4 @@ for key in datasets_dictionary:
         print()
 
         break
+
