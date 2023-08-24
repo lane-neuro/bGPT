@@ -1,0 +1,15 @@
+<component name="CopyrightManager">
+  <settings default="MIT">
+    <module2copyright>
+      <element module="Open Files" copyright="MIT" />
+    </module2copyright>
+    <LanguageOptions name="Python">
+      <option name="fileTypeOverride" value="3" />
+      <option name="addBlankBefore" value="true" />
+      <option name="block" value="false" />
+    </LanguageOptions>
+    <LanguageOptions name="__TEMPLATE__">
+      <option name="addBlankBefore" value="true" />
+    </LanguageOptions>
+  </settings>
+</component>
