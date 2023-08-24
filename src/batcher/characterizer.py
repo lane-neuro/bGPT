@@ -1,0 +1,3 @@
+
+class characterizer:
+    pass
