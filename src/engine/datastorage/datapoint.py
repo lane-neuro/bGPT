@@ -1,25 +1,21 @@
 from copy import deepcopy
 
+from engine.datastorage.metadata import metadata
+
 
 class datapoint:
 
-    def __init__(self, x_in: float, y_in: float, likelihood_in: float = None):
+    def __init__(self, meta_in: metadata, x_in: float, y_in: float):
+        self.metadata = meta_in
         self.x = float(x_in)
         self.y = float(y_in)
-        self.likelihood = float(likelihood_in) if likelihood_in else None
 
     def formatted_str(self):
-        if self.likelihood is not None:
-            return f"{self.x}_{self.y}_{self.likelihood}"
-        else:
-            return f"{self.x}_{self.y}"
+        return f"{self.x}_{self.y}"
 
     def __repr__(self):
-        if self.likelihood is not None:
-            return f"{self.x}_{self.y}_{self.likelihood}"
-        else:
-            return f"{self.x}_{self.y}"
+        return f"{self.x}_{self.y}"
 
-    def transform(self, engine: bGPT_engine):
+    def transform(self):
         new_datapoint = deepcopy(self)  # Create a new data point object
-        return engine.transform(new_datapoint)
+        return self.metadata.engine.transform(new_datapoint)

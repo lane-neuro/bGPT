@@ -1,5 +1,6 @@
 import random
 
+
 class ScaleTransform:
 
     def __init__(self, min_in: float, max_in: float, random_in: float):

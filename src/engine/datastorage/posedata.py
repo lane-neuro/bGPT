@@ -2,12 +2,12 @@ import csv
 from copy import deepcopy
 from itertools import islice
 
-from engine.datastorage import metadata
-from engine.datastorage.frame import frame
+from src.engine.datastorage.frame import frame
+from src.engine.datastorage.metadata import metadata
 
 
 class posedata:
-    def __init__(self, meta: bGPT_metadata, verbose):
+    def __init__(self, meta: metadata, verbose):
         self.meta = meta
         self.verbose = verbose
         self.frames = []
@@ -30,30 +30,23 @@ class posedata:
             self.meta.end_index = len(self.frames)
 
         for iframe in self.frames:
-            rounded_frame = self.round_frame(iframe)
+            # rounded_frame = self.round_frame(iframe)
             frame_str = "<"
-            for coord in rounded_frame.coords:
+            for coord in iframe.coords:
                 x_str = "{:08.3f}".format(coord.x)
                 y_str = "{:08.3f}".format(coord.y)
-                if self.meta.use_likelihood:
-                    likelihood_str = "{:07.3f}".format(coord.likelihood)
-                    frame_str += f"{x_str} {y_str} {likelihood_str}_"
-                else:
-                    frame_str += f"{x_str} {y_str}_"
+                frame_str += f"{x_str} {y_str}_"
             frame_str += ">"
-            pose_out += frame_str.rstrip(',')  # Remove trailing comma if present
+            frame_str.rstrip(',')   # Remove trailing comma if present
+            pose_out += frame_str
         return pose_out
 
-    def round_frame(self, frame):
+    def round_frame(self, frame_in):
         # Create a deep copy so that the original data isn't modified
-        rounded_frame = deepcopy(frame)
+        rounded_frame = deepcopy(frame_in)
         for coord in rounded_frame.coords:
             coord.x = round(coord.x, 3)
             coord.y = round(coord.y, 3)
-            if self.meta.use_likelihood:
-                coord.likelihood = round(coord.likelihood, 3)
-            else:
-                coord.likelihood = None  # You can set it to None or just not store it at all.
         return rounded_frame
 
     def extract_csv(self):
@@ -81,13 +74,13 @@ class posedata:
                 print('Subset indices:', subset_indices)
                 print('self.meta.bodyparts', self.meta.bodyparts)
 
-            for row in islice(csv_file, self.start_index, self.end_index, self.frame_resample_by):
-                self.frames.extend([frame(self.meta.use_likelihood, row[:])])
+            for row in islice(csv_file, self.start_index, self.end_index):
+                self.frames.extend([frame(self.meta, row[:])])
 
         if self.verbose:
             print(f"posedata: \'{self.meta.animal}\' .csv file extracted for {self.meta.bodyparts} coordinates across {len(self.frames)} frames.")
 
-    def transform(self, engine: bGPT_engine):
+    def transform(self):
         for iframe in self.frames:
-            iframe.transform(engine)
+            iframe.transform(self.meta.engine)
         return self

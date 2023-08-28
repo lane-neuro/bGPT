@@ -11,4 +11,5 @@ class trainer:
         print(f"trainer: training data initialized")
 
     def __repr__(self):
-        return f"trainer:(\n'train files:{self.train}\n',\n'validate files{self.validate}\n',\n'test files{self.test}\n')"
+        return (f"trainer:(\n'train files:{self.train_files}\n',\n'validate files{self.validate_files}\n',\n'test files"
+                f"{self.test_files}\n')")

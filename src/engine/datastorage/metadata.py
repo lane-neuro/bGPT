@@ -1,11 +1,10 @@
-import src.engine.csv_engine
-import engine
+from src.engine import csv_engine
 
 
 class metadata:
 
-    def __init__(self, engine_in: src.csv_engine, animal: str, csv_path: str, framerate: int, frame_resample_by: int,
-                 bodyparts: list = None, coordinate_system: str = "xy", use_likelihood: bool = True,
+    def __init__(self, engine_in: csv_engine, animal: str, csv_path: str, framerate: int, frame_resample_by: int,
+                 bodyparts: list = None, coordinate_system: str = "xy",
                  verbose: bool = False, start_index: int = None, end_index: int = None):
 
         # stores the engine
@@ -21,7 +20,6 @@ class metadata:
         self.framerate = framerate
         self.frame_resample_by = frame_resample_by
         self.coordinate_system = coordinate_system
-        self.use_likelihood = use_likelihood
 
         # stores current frame range
         self.start_index = start_index

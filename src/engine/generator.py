@@ -1,16 +1,16 @@
 import matplotlib.pyplot as plt
 
-from engine.csv_engine import csv_engine
-from engine.datastorage.posedata import posedata
+from engine.datastorage.metadata import metadata
+from src.engine.datastorage.posedata import posedata
 
 
 class generator:
 
-    def __init__(self, engine_in: csv_engine, verbose):
+    def __init__(self, meta_in: metadata, verbose):
         self.verbose = verbose
 
-        self.engine = engine_in
-        self.meta = self.engine.meta
+        self.meta = meta_in
+        self.engine = self.meta.engine
 
         self.pose = posedata(self.meta, verbose)
         self.pose.extract_csv()
@@ -18,7 +18,7 @@ class generator:
     def transform(self, *args):
         transformations = list(args)
         # self.engine = csv_engine(transformations)
-        self.pose.transform(self.engine)
+        self.pose.transform()
         self.pose.frames = _ShiftTransform(self.pose.frames)
         return repr(self)
 
