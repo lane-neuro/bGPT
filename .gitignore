@@ -15,5 +15,5 @@ src/tranformation_lib/__pycache__/TranslateTransform.cpython-310.pyc
 todo_planning
 hierarchy
 .DS_Store
-.idea
-__pycache__
+.idea/*
+__pycache__/*
