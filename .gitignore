@@ -12,6 +12,8 @@ src/tranformation_lib/__pycache__/RotateTransform.cpython-310.pyc
 src/tranformation_lib/__pycache__/ScaleTransform.cpython-310.pyc
 src/tranformation_lib/__pycache__/TranslateTransform.cpython-310.pyc
 *.pyc
-example/bGPT_debug.py
 todo_planning
 hierarchy
+.DS_Store
+.idea
+__pycache__
