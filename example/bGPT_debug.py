@@ -85,7 +85,7 @@ for key in datasets_dictionary:
     len_pose = len(pose)
     len_enc_pose = len(enc_pose)
 
-#    tokenization_compression_ratio = len_enc_pose / len_pose
+    #    tokenization_compression_ratio = len_enc_pose / len_pose
 
     with open(key, 'r') as file:
         nrows_csv = sum(1 for _ in islice(file, 3, None))
@@ -106,15 +106,15 @@ for key in datasets_dictionary:
     if characters_per_bodypart != 18:
         print('ERROR: characters_per_bodypart != 18')
 
-#    window_width = math.ceil(block_size / (characters_per_row * tokenization_compression_ratio))
-#    print('window_width =', window_width, '; characters per row =', characters_per_row, '; characters per bodypart =',
-#          characters_per_bodypart)
-#    print('enc_characters_per_row =', enc_characters_per_row, '; tokenization_compression_ratio =',
-#          tokenization_compression_ratio)
-#    nframes_enc_block = (block_size - len_enc_metadata) / enc_characters_per_row
-#    print('nframes_enc_block =', nframes_enc_block)
+    #    window_width = math.ceil(block_size / (characters_per_row * tokenization_compression_ratio))
+    #    print('window_width =', window_width, '; characters per row =', characters_per_row, '; characters per bodypart =',
+    #          characters_per_bodypart)
+    #    print('enc_characters_per_row =', enc_characters_per_row, '; tokenization_compression_ratio =',
+    #          tokenization_compression_ratio)
+    #    nframes_enc_block = (block_size - len_enc_metadata) / enc_characters_per_row
+    #    print('nframes_enc_block =', nframes_enc_block)
 
-#    scanners_dictionary[key]['window_width'] = window_width
+    #    scanners_dictionary[key]['window_width'] = window_width
 
     scanner_dict['length_meta'] = len_metadata
     scanner_dict['length_pose'] = len_pose
@@ -124,7 +124,7 @@ for key in datasets_dictionary:
 
     for ikey in scanner_dict['scanners']:
         scanner_dict['scanners'][ikey]['start'] = scanner_start_positions[ikey]
-        scanner_dict['scanners'][ikey]['end'] = scanner_start_positions[ikey] #+ window_width
+        scanner_dict['scanners'][ikey]['end'] = scanner_start_positions[ikey]  # + window_width
 
     print('scanner_dict:', scanner_dict)
 
@@ -156,7 +156,6 @@ for key in datasets_dictionary:
         bgpt_engine = csv_engine(csv_path=key,
                                  animal=datasets_dictionary[key][0],
                                  framerate=fps,
-                                 use_likelihood=datasets_dictionary[key][2],
                                  bodyparts=datasets_dictionary[key][3],
                                  coordinate_system=datasets_dictionary[key][4],
                                  image_transformations=random_transforms,
