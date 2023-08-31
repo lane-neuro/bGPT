@@ -3,13 +3,14 @@ from src.engine import csv_engine
 
 class metadata:
 
-    def __init__(self, engine_in: csv_engine, animal: str, csv_path: str, framerate: int, frame_resample_by: int,
-                 bodyparts: list = None, coordinate_system: str = "xy",
-                 verbose: bool = False, start_index: int = None, end_index: int = None):
+    def __init__(self, engine_in: csv_engine, animal: str, csv_path: str, framerate: int,
+                 bodyparts: list = None, coordinate_system: str = "xy", csv_type: str = "DLC",
+                 verbose: bool = False):
 
         # stores the engine
         self.engine = engine_in
         self.verbose = verbose
+        self.csv_type = csv_type
 
         # stores metadata of the animal
         self.animal = animal
@@ -18,12 +19,7 @@ class metadata:
         # stores metadata of the video
         self.csv_path = csv_path
         self.framerate = framerate
-        self.frame_resample_by = frame_resample_by
         self.coordinate_system = coordinate_system
-
-        # stores current frame range
-        self.start_index = start_index
-        self.end_index = end_index
 
         if self.verbose:
             print(f"metadata: metadata storage initialized")
@@ -32,7 +28,7 @@ class metadata:
         return f"metadata:(Animal: \'{self.animal}\', Framerate: {self.framerate}fps, Start index: \'{self.start_index}\')"
 
     def pack(self):
-        packed = f"{self.animal}~{self.framerate}~{self.coordinate_system}"
+        packed = f"{self.animal}~{self.framerate}fps~{self.coordinate_system}"
         bodyparts_str = ','.join(self.bodyparts)
         packed = f"{packed}~{bodyparts_str}~"
         return packed

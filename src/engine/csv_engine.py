@@ -1,4 +1,5 @@
 from src.engine.datastorage.metadata import metadata
+from src.engine.datastorage.posedata import posedata
 from src.engine.generator import generator
 from src.trainer import trainer
 
@@ -6,56 +7,37 @@ from src.trainer import trainer
 class csv_engine:
     def __init__(self, animal: str, framerate: int, csv_path: str,
                  bodyparts: list = None, coordinate_system: str = "xy",
-                 image_transformations: list = None,
-                 resample_fps: int = None, verbose: bool = False,
-                 start_index: int = None, end_index: int = None):
+                 csv_type: str = "DLC", verbose: bool = False):
         self.verbose = verbose
-        self.resample_fps = resample_fps
 
-        framerate = framerate
-        frame_resample_by = 1
-        if self.resample_fps is not None:
-            frame_resample_by = framerate // self.resample_fps
-            if verbose:
-                print(
-                    f"csv_engine: Resampling video to {self.resample_fps}fps, frames resample by {frame_resample_by}th index")
-            framerate = self.resample_fps
+        self.pose = posedata(csv_path=csv_path,
+                             csv_type=csv_type,
+                             verbose=verbose)
 
-        self.meta = metadata(self, animal, csv_path, framerate, frame_resample_by,
-                             bodyparts, coordinate_system, verbose,
-                             start_index, end_index)
-        self.generator = generator(self.meta, verbose)
+        self.tensor, self.bodyparts = self.pose.extract_csv()
 
-        if image_transformations is None:
-            self.transformations = []
-        else:
-            self.transformations = image_transformations
-        if verbose:
-            print("csv_engine: transformation engine initialized")
+        ## if bodyparts and self.bodyparts are not the same, but have the same length
+        ## overwrite self.bodyparts with bodyparts
+        if bodyparts is not None:
+            if len(bodyparts) == len(self.bodyparts):
+                self.bodyparts = bodyparts
+            else:
+                raise ValueError("bodyparts passed in but self.bodyparts are not the same length")
 
-    def __repr__(self):
-        transformations = ', '.join([str(transform) for transform in self.transformations])
-        return (f"generator:(\nMetadata:\'{self.meta}\',\n\nTransformations: [{transformations}],\n\nPose Tokens:"
-                f"\'{self.pack_generator()}\', \n\nNumber of Pose Tokens: {len(self.pack_generator())})")
-
-    def pack_generator(self, apply_transformations: bool = True):
-        return self.generator.pose.pack()
+        self.meta = metadata(self,
+                             animal=animal,
+                             csv_path=csv_path,
+                             framerate=framerate,
+                             bodyparts=self.bodyparts,
+                             coordinate_system=coordinate_system,
+                             verbose=verbose,
+                             csv_type=csv_type)
 
     def pack_meta(self):
         return self.meta.pack()
 
-    def visualize_transformations(self, cmap='nipy_spectral', transformations: list = None):
-        if transformations is None:
-            transformations = self.transformations
-        return self.generator.visualize_transformations(transformations, cmap)
+    def return_tensor(self):
+        return self.tensor
 
-    def transform(self, datapoint):
-        for transformation in self.transformations:
-            datapoint = transformation.transform(datapoint)
-        return datapoint
-
-    def add_transformation(self, transformation):
-        self.transformations.append(transformation)
-
-    def load_dataset(self, training_files_in, validate_files_in, test_files_in):
-        training_init = trainer(training_files_in, validate_files_in, test_files_in)
+    def return_bodyparts(self):
+        return self.bodyparts

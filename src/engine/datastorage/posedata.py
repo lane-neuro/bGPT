@@ -1,35 +1,17 @@
-import csv
-from copy import deepcopy
-from itertools import islice
 import torch
 import pandas as pd
 
-from src.engine.datastorage.frame import frame
-from src.engine.datastorage.metadata import metadata
-
-
 class posedata:
-    def __init__(self, meta, verbose):
-        self.meta = meta
+    def __init__(self, csv_path: str, csv_type: str, verbose: bool = False):
+        self.csv_path = csv_path
+        self.csv_type = csv_type
         self.verbose = verbose
 
-        if self.meta.is_dlc:
-            tensor, body_parts = self.extract_dlc_csv()
-            self.tensor = tensor
-            self.body_parts = body_parts
-
-        meta_bodyparts = self.meta.bodyparts
-        if meta_bodyparts is not None:
-            ## check if length of bodyparts is the same as meta bodyparts
-            if len(meta_bodyparts) != len(self.body_parts):
-                raise ValueError(f"posedata: Bodyparts in metadata ({len(meta_bodyparts)}) does not match bodyparts in DLC csv ({len(body_parts)})")
-            else:
-                ## overwrite self.body_parts with meta bodyparts
-                self.body_parts = meta_bodyparts
+        self.tensor, self.bodyparts = self.extract_csv()
 
         if self.verbose:
             print(f"posedata: posedata storage initialized")
-            print(f"posedata: Bodyparts: {self.body_parts}")
+            print(f"posedata: Bodyparts: {self.bodyparts}")
             print(f"posedata: Tensor shape: {self.tensor.shape}")
 
     def extract_dlc_csv(self):
@@ -56,8 +38,14 @@ class posedata:
         def convert_dlc_csv_to_tensor(df):
             df_tensor = torch.tensor(df.values.astype('float32'), dtype=torch.float32)
             return df_tensor
-        csv_path = self.meta.csv_path
+        csv_path = self.csv_path
         df = open_dlc_csv(csv_path)
         tensor = convert_dlc_csv_to_tensor(df)
-        body_parts = df.columns[::2]
-        return tensor, body_parts
+        bodyparts = df.columns[::2]
+        return tensor, bodyparts
+
+    def extract_csv(self):
+        if self.csv_type == "DLC":
+            tensor, bodyparts = self.extract_dlc_csv()
+        return tensor, bodyparts
+
