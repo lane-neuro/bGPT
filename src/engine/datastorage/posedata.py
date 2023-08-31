@@ -1,86 +1,63 @@
 import csv
 from copy import deepcopy
 from itertools import islice
+import torch
+import pandas as pd
 
 from src.engine.datastorage.frame import frame
 from src.engine.datastorage.metadata import metadata
 
 
 class posedata:
-    def __init__(self, meta: metadata, verbose):
+    def __init__(self, meta, verbose):
         self.meta = meta
         self.verbose = verbose
-        self.frames = []
-        self.frame_resample_by = self.meta.frame_resample_by
-        self.start_index = self.meta.start_index
-        self.end_index = self.meta.end_index
-        if self.end_index is not None:
-            self.end_index = int(self.end_index * self.frame_resample_by)
-        if self.verbose:
-            print(f"posedata: pose storage initialized")
-            print(f"posedata: frame resample by {self.frame_resample_by}")
-            print(f"posedata: start index {self.start_index}, end index {self.end_index}")
 
-    def __repr__(self):
-        return f"posedata:(\'{self.pack()}\')"
+        if self.meta.is_dlc:
+            tensor, body_parts = self.extract_dlc_csv()
+            self.tensor = tensor
+            self.body_parts = body_parts
 
-    def pack(self):
-        pose_out = ""
-        if self.meta.end_index == 0:
-            self.meta.end_index = len(self.frames)
-
-        for iframe in self.frames:
-            # rounded_frame = self.round_frame(iframe)
-            frame_str = "<"
-            for coord in iframe.coords:
-                x_str = "{:08.3f}".format(coord.x)
-                y_str = "{:08.3f}".format(coord.y)
-                frame_str += f"{x_str} {y_str}_"
-            frame_str += ">"
-            frame_str.rstrip(',')   # Remove trailing comma if present
-            pose_out += frame_str
-        return pose_out
-
-    def round_frame(self, frame_in):
-        # Create a deep copy so that the original data isn't modified
-        rounded_frame = deepcopy(frame_in)
-        for coord in rounded_frame.coords:
-            coord.x = round(coord.x, 3)
-            coord.y = round(coord.y, 3)
-        return rounded_frame
-
-    def extract_csv(self):
-        with open(self.meta.csv_path, mode='r') as file:
-            csv_file = csv.reader(file)
-
-            for i, row in enumerate(csv_file):
-                if i == 1:
-                    all_bodyparts = row[1:]
-                    csv_file.__next__()
-                    break
-
-            if self.meta.bodyparts is not None:
-                subset_indices = []
-                for i, bodypart in enumerate(all_bodyparts):
-                    if bodypart in self.meta.bodyparts:
-                        subset_indices.append(i)
-                subset_indices = [i+1 for i in subset_indices]
+        meta_bodyparts = self.meta.bodyparts
+        if meta_bodyparts is not None:
+            ## check if length of bodyparts is the same as meta bodyparts
+            if len(meta_bodyparts) != len(self.body_parts):
+                raise ValueError(f"posedata: Bodyparts in metadata ({len(meta_bodyparts)}) does not match bodyparts in DLC csv ({len(body_parts)})")
             else:
-                subset_indices = [i+1 for i in range(0, len(all_bodyparts))]
-                self.meta.bodyparts = all_bodyparts[::3]
-            subset_indices.insert(0, 0)
-
-            if self.verbose:
-                print('Subset indices:', subset_indices)
-                print('self.meta.bodyparts', self.meta.bodyparts)
-
-            for row in islice(csv_file, self.start_index, self.end_index):
-                self.frames.extend([frame(self.meta, row[:])])
+                ## overwrite self.body_parts with meta bodyparts
+                self.body_parts = meta_bodyparts
 
         if self.verbose:
-            print(f"posedata: \'{self.meta.animal}\' .csv file extracted for {self.meta.bodyparts} coordinates across {len(self.frames)} frames.")
+            print(f"posedata: posedata storage initialized")
+            print(f"posedata: Bodyparts: {self.body_parts}")
+            print(f"posedata: Tensor shape: {self.tensor.shape}")
 
-    def transform(self):
-        for iframe in self.frames:
-            iframe.transform(self.meta.engine)
-        return self
+    def extract_dlc_csv(self):
+        def open_dlc_csv(csv_path):
+            df = pd.read_csv(csv_path)
+
+            ## set the second row as the columns and drop columns and first row
+            df.columns = df.iloc[0]
+            df = df.drop(df.index[0:2])
+
+            ## drop the first column
+            df = df.drop(df.columns[0], axis=1)
+
+            ## drop every third column, which is the likelihood, avoid dropping same name columns by using indexing
+            ## get indexes to keep
+            drop_columns_index = range(2, len(df.columns), 3)
+            keep_columns_index = [i for i in range(len(df.columns)) if i not in drop_columns_index]
+
+            ## drop by index
+            df = df.iloc[:, keep_columns_index]
+
+            return df
+
+        def convert_dlc_csv_to_tensor(df):
+            df_tensor = torch.tensor(df.values.astype('float32'), dtype=torch.float32)
+            return df_tensor
+        csv_path = self.meta.csv_path
+        df = open_dlc_csv(csv_path)
+        tensor = convert_dlc_csv_to_tensor(df)
+        body_parts = df.columns[::2]
+        return tensor, body_parts
