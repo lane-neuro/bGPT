@@ -7,7 +7,7 @@ from itertools import islice
 import numpy as np
 import tiktoken
 
-from src.bGPT_aid import bGPT_aid
+from src.bGPT import bGPT
 from src.engine.csv_engine import csv_engine
 from src.tranformation_lib.JitterTransform import JitterTransform
 from src.tranformation_lib.PerspectiveTransform import PerspectiveTransform
@@ -30,8 +30,8 @@ enc = tiktoken.get_encoding(model_type)
 block_size = 1024
 batch_size = 8
 
-datasets_dictionary = bGPT_aid().make_datasets_dictionary(test_files[:2],
-                                                          "mouse", 60, False)
+datasets_dictionary = bGPT().make_datasets_dictionary(test_files[:2],
+                                                      "mouse", 60, False)
 scanners_dictionary = {key: {'scanners': {i: {'start': None, 'end': None} for i in range(0, batch_size)},
                              'length_meta': None,
                              'length_pose': None,

@@ -1,0 +1,43 @@
+[ROOT]	./bGPT/
+	README.md
+	requirements.txt
+	LICENSE
+	
+	./example/
+		bGPT_debug.py (dev/test script)
+		
+		./datasets/
+			[dataset files].csv
+			
+	./src/
+		bGPT.py
+		scheduler.py
+		trainer.py
+		
+		./batcher/
+			characterizer.py
+			token_stack.py
+			tokenizer.py
+			transformations.py
+			
+		./engine/
+			csv_engine.py
+			generator.py (temp file)
+			
+			./datastorage/
+				datapoint.py
+				frame.py
+				metadata.py
+				posedata.py
+			
+		./model_config/
+			nano_gpt.py
+			
+		./transformation_lib/
+			JitterTransform.py
+			PerspectiveTransform.py
+			RandomResampleFps.py
+			RotateTransform.py
+			ScaleTransform.py
+			TranslateTransform.py
+			

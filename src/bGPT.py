@@ -1,4 +1,7 @@
-class bGPT_aid:
+class bGPT:
+
+    def __init__(self):
+        print("[bGPT] initializing")
 
     def make_datasets_dictionary(self, files: list,
                                  animal: str, fps: int, use_likelihood,
