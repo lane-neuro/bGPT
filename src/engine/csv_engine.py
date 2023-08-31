@@ -1,8 +1,5 @@
 from src.engine.datastorage.metadata import metadata
 from src.engine.datastorage.posedata import posedata
-from src.engine.generator import generator
-from src.trainer import trainer
-
 
 class csv_engine:
     def __init__(self, animal: str, framerate: int, csv_path: str,

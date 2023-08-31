@@ -33,23 +33,7 @@ class metadata:
         packed = f"{packed}~{bodyparts_str}~"
         return packed
 
-    def modify_bodypart_name(self, index, name):
-        prior_name = self.bodyparts[index]
-        self.bodyparts[index] = name
-        if self.verbose:
-            print(f"metadata: Bodypart [{index}](\'{prior_name}\') renamed to \'{name}\'")
-
-    def set_start_index(self, index):
-        self.start_index = index
-        if self.verbose:
-            print(f"metadata: Start index set to {index}")
-
-    def set_end_index(self, index):
-        self.end_index = index
-        if self.verbose:
-            print(f"metadata: End index set to {index}")
-
-    def set_framerate(self, framerate):
+    def framerate(self, framerate):
         self.framerate = framerate
         if self.verbose:
             print(f"metadata: Framerate set to {framerate}")
