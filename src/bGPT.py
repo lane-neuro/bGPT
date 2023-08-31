@@ -5,10 +5,13 @@ import os
 class bGPT:
     # file locations
     config_path = "/bgpt_config.ini"
-    project_path = None
+    OUTPUT_FOLDER = "/output"
+    DATASETS_FOLDER = "/datasets"
+    CONFIG = None
 
     # project information
     project_name = None
+    project_path = None
     project_scheduler = None
     active_gpt_model = None
 
@@ -21,30 +24,66 @@ class bGPT:
     SCHEDULER = 'Scheduler'
     GPT_MODEL = 'GPTModel'
 
-
     def __init__(self):
         print("[bGPT] empty constructor")
 
     def new_project(self, project_name: str, project_path: str):
-        print(f"[bGPT] new project \'{project_name}\' at \'{project_path}\'")
+        self.project_name = project_name
+        self.project_path = project_path
+
+        # if project already exists in path, throw error and terminate session
+        if os.path.exists(self.project_path + '/' + self.project_name):
+            print(f"[bGPT] ERROR: Provided project name is already a directory in provided path. "
+                  f"Please provide a project name that has not yet been created. Terminating session.")
+            return
+        else:
+            self.project_path = self.project_path + '/' + self.project_name
+            os.mkdir(self.project_path)
+            os.chdir(self.project_path)
+            os.mkdir(self.OUTPUT_FOLDER)  # create output folder in path
+            os.mkdir(self.DATASETS_FOLDER)  # create datasets folder in path
+            print(f"[bGPT] new project directory created for \'{project_name}\' at \'{project_path}\'")
+
+            self.CONFIG = configparser.ConfigParser()   # create config file in path
+            self.CONFIG[self.DEFAULT_section] = {self.NAME: self.project_name,
+                                                 self.PATH: self.project_path,
+                                                 self.SCHEDULER: None,
+                                                 self.GPT_MODEL: None}
+            self._save_config()
 
     def load_project(self, project_path: str = os.getcwd()):
-        if os.path.exists(project_path):  # check if path exists
-            os.chdir(project_path)
-        else:  # if path does not exist, terminate session and print error
+        if not os.path.exists(project_path):  # if path does not exist, terminate session and print error
             print(f"[bGPT] ERROR: Provided path is not a valid directory. Terminating session.")
             return
-        print(f"[bGPT] load project at {project_path}")
+        else:  # check if path exists
+            os.chdir(project_path)
+            self.project_path = project_path
+            self._load_config(self.project_path + self.config_path)
+            print(f"[bGPT] project loaded: {self.project_name}")
 
-    def load_config(self, config_path: str = os.getcwd() + "/bgpt_config.ini"):
-        if os.path.exists(config_path):  # check if path exists
-            config = configparser.ConfigParser()
-            config.read(config_path)
-            self.project_name = config[self.DEFAULT_section][self.NAME]
-            print(f"[bGPT] config loaded for project: {self.project_name}")
-        else:  # if path does not exist, terminate session and print error
-            print(f"[bGPT] ERROR: Project path does not contain . Terminating session.")
+    def save_project(self):
+        self._save_config()
+        print(f"[bGPT] project saved: {self.project_name}")
+
+    def _load_config(self, config_path: str):
+        if not os.path.exists(config_path):  # if path does not exist, terminate session and print error
+            print(f"[bGPT] ERROR: Project path does not contain a valid configuration file. Terminating session.")
             return
+        else:  # if path exists
+            self.CONFIG = configparser.ConfigParser()
+            self.CONFIG.read(config_path)
+
+            self.project_name = self.CONFIG[self.DEFAULT_section][self.NAME]
+            self.project_path = self.CONFIG[self.DEFAULT_section][self.PATH]
+            self.project_scheduler = self.CONFIG[self.DEFAULT_section][self.SCHEDULER]
+            self.active_gpt_model = self.CONFIG[self.DEFAULT_section][self.GPT_MODEL]
+
+            print(f"[bGPT] config loaded for project: {self.project_name}")
+
+    def _save_config(self):
+        with open(self.project_path + self.config_path, 'w') as configfile:
+            self.CONFIG.write(configfile)
+        print(f"[bGPT] config saved for project: {self.project_name}")
 
     def make_datasets_dictionary(self, files: list,
                                  animal: str, fps: int, use_likelihood,

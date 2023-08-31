@@ -16,8 +16,8 @@ class csv_engine:
 
         self.tensor, self.bodyparts = self.pose.extract_csv()
 
-        ## if bodyparts and self.bodyparts are not the same, but have the same length
-        ## overwrite self.bodyparts with bodyparts
+        # if bodyparts and self.bodyparts are not the same, but have the same length
+        # overwrite self.bodyparts with bodyparts
         if bodyparts is not None:
             if len(bodyparts) == len(self.bodyparts):
                 self.bodyparts = bodyparts
