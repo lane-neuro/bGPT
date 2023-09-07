@@ -1,6 +1,7 @@
 import torch
 import pandas as pd
 
+
 class posedata:
     def __init__(self, csv_path: str, csv_type: str, verbose: bool = False):
         self.csv_path = csv_path
@@ -18,7 +19,7 @@ class posedata:
         def open_dlc_csv(csv_path):
             df = pd.read_csv(csv_path)
 
-            ## set the second row as the columns and drop columns and first row
+            # set the second row as the columns and drop columns and first row
             df.columns = df.iloc[0]
             df = df.drop(df.index[0:2])
 
@@ -38,6 +39,7 @@ class posedata:
         def convert_dlc_csv_to_tensor(df):
             df_tensor = torch.tensor(df.values.astype('float32'), dtype=torch.float32)
             return df_tensor
+
         csv_path = self.csv_path
         df = open_dlc_csv(csv_path)
         tensor = convert_dlc_csv_to_tensor(df)
@@ -48,4 +50,3 @@ class posedata:
         if self.csv_type == "DLC":
             tensor, bodyparts = self.extract_dlc_csv()
         return tensor, bodyparts
-

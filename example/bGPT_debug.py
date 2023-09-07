@@ -8,7 +8,7 @@ import numpy as np
 import tiktoken
 
 from src.bGPT import bGPT
-from src.engine.csv_engine import csv_engine
+from engine.datastorage.csv_engine import csv_engine
 from src.tranformation_lib.JitterTransform import JitterTransform
 from src.tranformation_lib.PerspectiveTransform import PerspectiveTransform
 from src.tranformation_lib.RandomResampleFps import RandomResampleFps
@@ -17,7 +17,7 @@ from src.tranformation_lib.ScaleTransform import ScaleTransform
 from src.tranformation_lib.TranslateTransform import TranslateTransform
 
 print("cwd: ", os.getcwd())
-datasets_dir = os.getcwd() + "/example/datasets/"
+datasets_dir = os.getcwd() + "/datasets/"
 # array of dataset files in directory
 test_files = os.listdir(datasets_dir)
 # append datasets_dir to each file name

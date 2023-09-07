@@ -1,4 +1,4 @@
-from src.engine import csv_engine
+from engine.datastorage import csv_engine
 
 
 class metadata:
@@ -25,7 +25,7 @@ class metadata:
             print(f"metadata: metadata storage initialized")
 
     def __repr__(self):
-        return f"metadata:(Animal: \'{self.animal}\', Framerate: {self.framerate}fps, Start index: \'{self.start_index}\')"
+        return f"metadata:(Animal: \'{self.animal}\', Framerate: {self.framerate}fps)"
 
     def pack(self):
         packed = f"{self.animal}~{self.framerate}fps~{self.coordinate_system}"
