@@ -65,7 +65,7 @@ for key in datasets_dictionary:
                              animal=datasets_dictionary[key][0],
                              framerate=datasets_dictionary[key][1],
                              bodyparts=datasets_dictionary[key][3],
-                             verbose=False)
+                             verbose=True)
 
     metadata = bgpt_engine.pack_meta()
     len_metadata = len(metadata)
@@ -73,6 +73,9 @@ for key in datasets_dictionary:
     enc_metadata = enc.encode_ordinary(metadata)
     len_enc_metadata = len(enc_metadata)
     print('len_enc_metadata:', len_enc_metadata)
+
+    print('Tensor:', bgpt_engine.tensor)
+    print('Tensor.shape:', bgpt_engine.tensor.shape)
 
     bodyparts = metadata.split('~')[-2]
     bodyparts = [s for s in bodyparts.split(',')]
