@@ -67,7 +67,7 @@ class dataset_engine:
 
     def train_data(self, n_examples):
 
-        # need to add exception handling
+        # need to add exception handling, fix tensor issue
         tensors = torch.empty()
         train_combinations = random.sample(self.possible_combinations, n_examples)
         for combination in train_combinations:
