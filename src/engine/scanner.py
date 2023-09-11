@@ -6,6 +6,9 @@ class scanner:
                  nscanner: int,
                  batch_size: int,
                  n_bodyparts: int,
+                 n_bodyparts_min_aug: int,
+                 framerate: int,
+                 framerate_min_aug: int,
                  nrows_tensor: int,
                  n_chars_per_bodypart: int,
                  block_size: int, ):
@@ -34,9 +37,9 @@ class scanner:
 
     def get_indices(self):
         if not self.in_epoch:
-            return None
+            return None, None
         else:
-            row_incides = (self.row_position_call_start, self.row_position_call_end)
+            row_indices = (self.row_position_call_start, self.row_position_call_end)
             char_index = self.char_call_position
 
             self.char_call_position += 1
@@ -51,4 +54,4 @@ class scanner:
                 self.row_position_end = math.floor(((self.nscanner + 1) / (self.batch_size + 1)) * self.nrows_tensor)
                 self.char_call_position = 0
 
-            return row_incides, char_index
+            return row_indices, char_index
