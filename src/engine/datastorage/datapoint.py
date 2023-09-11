@@ -1,5 +1,4 @@
 from copy import deepcopy
-
 from engine.datastorage.metadata import metadata
 
 

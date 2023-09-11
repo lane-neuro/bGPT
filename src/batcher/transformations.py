@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 class transformations:
 
-    #definitions
-    trans_list = []
+    def __init__(self):
+        self.trans_list = None
 
     def transform(self, *args):
         self.trans_list = list(args)

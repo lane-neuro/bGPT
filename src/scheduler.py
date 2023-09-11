@@ -1,14 +1,15 @@
 from batcher.token_stack import token_stack
+import multiprocessing as mp
 
 
 class scheduler:
     # role: timing & scheduling of dataset_engine/batcher
 
-    # definitions
-    trans_list = []
-    t_stack: token_stack = None
-
-    def __init__(self):
+    def __init__(self, process_size: int = 1):
+        self.process_size = process_size
+        self.thread_stack = []
+        self.trans_list = []
+        # self.tokens = token_stack(first_token=None)
         return
 
     def scan_loop(self):
@@ -20,4 +21,4 @@ class scheduler:
 
         # add to token_stack
 
-        return self.t_stack
+        return

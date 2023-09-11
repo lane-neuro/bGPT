@@ -7,6 +7,7 @@ import itertools
 
 import torch
 
+
 class dataset_engine:
     # definitions
     meta = None
@@ -33,7 +34,8 @@ class dataset_engine:
                              bodyparts=bodyparts,
                              coordinate_system=coordinate_system,
                              verbose=verbose,
-                             csv_type=csv_type)
+                             csv_type=csv_type,
+                             csv_path=csv_paths)
 
         # initializes csv_engines
         self.csv_engines = {}

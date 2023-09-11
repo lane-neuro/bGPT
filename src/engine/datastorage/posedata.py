@@ -1,19 +1,21 @@
 import torch
 import pandas as pd
 
+from bGPT import bGPT_output
+
 
 class posedata:
     def __init__(self, csv_path: str, csv_type: str, verbose: bool = False):
-        self.csv_path = csv_path
+        self.csv_path: str = csv_path
         self.csv_type = csv_type
         self.verbose = verbose
 
         self.tensor, self.bodyparts = self.extract_csv()
 
         if self.verbose:
-            print(f"posedata: posedata storage initialized")
-            print(f"posedata: Bodyparts: {self.bodyparts}")
-            print(f"posedata: Tensor shape: {self.tensor.shape}")
+            bGPT_output("posedata", "info", f"storage initialized")
+            bGPT_output("posedata", "info", f"Bodyparts: {self.bodyparts}")
+            bGPT_output("posedata", "info", f"Tensor shape: {self.tensor.shape}")
 
     def extract_dlc_csv(self):
         def open_dlc_csv(csv_path):

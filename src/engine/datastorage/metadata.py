@@ -1,9 +1,10 @@
+from bGPT import bGPT_output
 from engine.datastorage import csv_engine
 
 
 class metadata:
 
-    def __init__(self, engine_in: csv_engine, animal: str, csv_path: str, framerate: int,
+    def __init__(self, engine_in: csv_engine, animal: str, csv_path: list, framerate: int,
                  bodyparts: list = None, coordinate_system: str = "xy", csv_type: str = "DLC",
                  verbose: bool = False):
 
@@ -22,7 +23,7 @@ class metadata:
         self.coordinate_system = coordinate_system
 
         if self.verbose:
-            print(f"metadata: metadata storage initialized")
+            bGPT_output("metadata", "info", f"storage initialized")
 
     def __repr__(self):
         return f"metadata:(Animal: \'{self.animal}\', Framerate: {self.framerate}fps)"
@@ -36,4 +37,4 @@ class metadata:
     def framerate(self, framerate):
         self.framerate = framerate
         if self.verbose:
-            print(f"metadata: Framerate set to {framerate}")
+            bGPT_output("metadata", "info", f"Framerate set to {framerate}")

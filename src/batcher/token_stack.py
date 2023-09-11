@@ -9,10 +9,8 @@ class token_stack:
 
     # [[],[],[]]: tokens = torch.tensor(tokens, new_token)
 
-    # definitions
-    tokens: torch.tensor = []
-
     def __init__(self, first_token):
+        self.tokens = []
         self.__add__(first_token)
         return
 
